@@ -13,6 +13,11 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
     ${CommonStyle};
   }
+
+  * {
+    box-sizing: border-box;
+    font-family: 'Lato', sans-serif !important;
+  }
 `;
 
 const queryClient = new QueryClient({

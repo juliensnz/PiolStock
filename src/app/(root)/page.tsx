@@ -1,7 +1,9 @@
 'use client';
 
+import {Stock} from '@/app/(root)/components/Stock';
 import {Table} from 'akeneo-design-system';
 import Image from 'next/image';
+import {useState} from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -9,6 +11,7 @@ const Container = styled.div`
 `;
 
 export default function Home() {
+  const [value, setValue] = useState(0);
   return (
     <Container>
       <Table>
@@ -30,7 +33,9 @@ export default function Home() {
             </Table.Cell>
             <Table.Cell>Des fleurs</Table.Cell>
             <Table.Cell>A4</Table.Cell>
-            <Table.Cell>22</Table.Cell>
+            <Table.Cell>
+              <Stock value={value} onChange={setValue} />
+            </Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.Cell>
@@ -43,7 +48,9 @@ export default function Home() {
             </Table.Cell>
             <Table.Cell>Des fleurs</Table.Cell>
             <Table.Cell>A4</Table.Cell>
-            <Table.Cell>22</Table.Cell>
+            <Table.Cell>
+              <Stock value={12} onChange={() => {}} />
+            </Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.Cell>
@@ -56,7 +63,9 @@ export default function Home() {
             </Table.Cell>
             <Table.Cell>Des fleurs</Table.Cell>
             <Table.Cell>A4</Table.Cell>
-            <Table.Cell>22</Table.Cell>
+            <Table.Cell>
+              <Stock value={12} onChange={() => {}} />
+            </Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.Cell>
@@ -69,7 +78,9 @@ export default function Home() {
             </Table.Cell>
             <Table.Cell>Des fleurs</Table.Cell>
             <Table.Cell>A4</Table.Cell>
-            <Table.Cell>22</Table.Cell>
+            <Table.Cell>
+              <Stock value={12} onChange={() => {}} />
+            </Table.Cell>
           </Table.Row>
         </Table.Body>
       </Table>
