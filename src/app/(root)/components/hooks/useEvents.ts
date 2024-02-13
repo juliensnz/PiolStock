@@ -1,21 +1,21 @@
-import {Event} from '@/domain/model/Event';
-import {eventRepository} from '@/infrastructure/EventRepository';
+import {Format, Product} from '@/domain/model/Product';
+import {productRepository} from '@/infrastructure/ProductRepository';
 import {useFirestoreQuery} from '@/lib/useFirestoreQuery/useFirestoreQuery';
 import {useCallback} from 'react';
 
-const useEvents = <T extends Event>(types: T['type'][]) => {
-  const ref = eventRepository.getRef<T>(types);
+const useProducts = (formats: Format[]) => {
+  const ref = productRepository.getRef(formats);
 
   if (ref.isError()) throw ref.getError();
 
-  const query = useFirestoreQuery(['events', ...types], ref.get(), {subscribe: true});
+  const query = useFirestoreQuery(['prodcuts', ...formats], ref.get(), {subscribe: true});
 
   return query;
 };
 
-const useAddEvent = <T extends Event>() => {
-  return useCallback(async (event: Omit<T, 'id'>): Promise<Event> => {
-    const result = await eventRepository.addEvent(event);
+const useAddProduct = () => {
+  return useCallback(async (prodcut: Omit<Product, 'id'>): Promise<Product> => {
+    const result = await productRepository.addProduct(prodcut);
 
     if (result.isError()) throw result.getError();
 
@@ -23,4 +23,4 @@ const useAddEvent = <T extends Event>() => {
   }, []);
 };
 
-export {useEvents, useAddEvent};
+export {useProducts, useAddProduct};
