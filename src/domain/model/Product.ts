@@ -1,5 +1,3 @@
-import {UUID} from 'crypto';
-
 const FORMATS_A2 = 'A2';
 const FORMATS_A3 = 'A3';
 const FORMATS_A4 = 'A4';
@@ -9,7 +7,11 @@ const FORMATS_A6 = 'A6';
 const FORMATS = [FORMATS_A2, FORMATS_A3, FORMATS_A4, FORMATS_A5, FORMATS_A6] as const;
 type Format = typeof FORMATS[number];
 
-type ProductId = UUID;
-type Product = {id: ProductId; format: Format};
+type ProductId = string;
+type Product = {id: ProductId; format: Format; name: string; image: string; stock: number};
+
+const createProducts = (name: string, image: string): Product[] =>
+  FORMATS.map(format => ({id: crypto.randomUUID(), format, name, image, stock: 0}));
 
 export type {Product, ProductId, Format};
+export {createProducts};

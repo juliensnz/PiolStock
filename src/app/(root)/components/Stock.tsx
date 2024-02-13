@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import {getColor} from 'akeneo-design-system';
+import {useCallback} from 'react';
 
 const Container = styled.div`
   border: 1px solid #d2d2d2;
@@ -12,8 +13,8 @@ const Container = styled.div`
 
 const NumberInput = styled.input`
   height: 100%;
-  width: 50px;
-  font-size: 20px;
+  width: 60px;
+  font-size: 25px;
   text-align: center;
   padding: 2px 5px;
   font-family: inherit;
@@ -51,24 +52,32 @@ const ChangeButton = styled.button<{color: string; gradient: number}>`
 
 type StockProps = {
   value: number;
+  increment: number;
   onChange: (value: number) => void;
 };
 
-const Stock = ({value, onChange}: StockProps) => {
+const Stock = ({value, onChange, increment = 4}: StockProps) => {
+  const handleChange = useCallback(
+    (updatedValue: number) => {
+      onChange(updatedValue < 0 ? 0 : updatedValue);
+    },
+    [onChange]
+  );
+
   return (
     <Container>
-      <ChangeButton color="red" gradient={140} onClick={() => onChange(value - 10)}>
-        -10
+      <ChangeButton color="red" gradient={140} onClick={() => handleChange(value - increment)}>
+        -{increment}
       </ChangeButton>
-      <ChangeButton color="red" gradient={100} onClick={() => onChange(value - 1)}>
+      <ChangeButton color="red" gradient={100} onClick={() => handleChange(value - 1)}>
         -1
       </ChangeButton>
-      <NumberInput type="number" value={value} onChange={event => onChange(Number(event.target.value))} />
-      <ChangeButton color="green" gradient={100} onClick={() => onChange(value + 1)}>
+      <NumberInput type="number" value={value} onChange={event => handleChange(Number(event.target.value))} />
+      <ChangeButton color="green" gradient={100} onClick={() => handleChange(value + 1)}>
         +1
       </ChangeButton>
-      <ChangeButton color="green" gradient={140} onClick={() => onChange(value + 10)}>
-        +10
+      <ChangeButton color="green" gradient={140} onClick={() => handleChange(value + increment)}>
+        +{increment}
       </ChangeButton>
     </Container>
   );

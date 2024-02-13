@@ -1,7 +1,6 @@
-import {Format, Product, ProductId} from '@/domain/model/Product';
+import {Product, ProductId} from '@/domain/model/Product';
 import {Either, Result} from '@/domain/model/Result';
 import {RuntimeError} from '@/domain/model/RuntimeError';
-import {isString} from '@/domain/model/utils';
 import {firebaseApp} from '@/lib/firebase';
 import {
   getFirestore,
@@ -10,7 +9,6 @@ import {
   Firestore,
   query,
   collection,
-  where,
   onSnapshot,
   orderBy,
   deleteDoc,
@@ -48,13 +46,9 @@ const productRepositoryCreator = ({db}: {db: Firestore}) => ({
       });
     }
   },
-  getRef: (format: Format | Format[]) => {
+  getRef: () => {
     try {
-      const q = query(
-        collection(db, 'products'),
-        where('format', isString(format) ? '==' : 'in', format),
-        orderBy('timestamp', 'desc')
-      );
+      const q = query(collection(db, 'products'), orderBy('format', 'asc'));
 
       return Result.Ok(q);
     } catch (error) {
@@ -65,9 +59,9 @@ const productRepositoryCreator = ({db}: {db: Firestore}) => ({
       });
     }
   },
-  streamProducts: (updateProducts: (products: Product[]) => void, format: Format) => {
+  streamProducts: (updateProducts: (products: Product[]) => void) => {
     try {
-      const q = query(collection(db, 'products'), where('format', '==', format), orderBy('timestamp', 'desc'));
+      const q = query(collection(db, 'products'), orderBy('format', 'asc'));
       const unsubscribe = onSnapshot(q, querySnapshot => {
         const products: Product[] = [];
         querySnapshot.forEach(doc => {

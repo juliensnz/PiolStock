@@ -3,7 +3,6 @@ const withImages = require('next-images');
 const webpack = require('webpack');
 const withPlugins = require('next-compose-plugins');
 const withTM = require('next-transpile-modules')(['akeneo-design-system']);
-const withPWA = require('next-pwa');
 
 module.exports = withPlugins([withTM, [withImages]], {
   webpack: (config, options) => {
@@ -19,6 +18,7 @@ module.exports = withPlugins([withTM, [withImages]], {
 
     return config;
   },
+  compiler: {styledComponents: true},
   reactStrictMode: true,
   images: {
     remotePatterns: [

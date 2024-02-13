@@ -1,9 +1,9 @@
 import StyledComponentsRegistry from '@/lib/registry';
 import type {Metadata} from 'next';
-import {Inter} from 'next/font/google';
+import {Lato} from 'next/font/google';
 import {Analytics} from '@vercel/analytics/react';
 
-const inter = Inter({subsets: ['latin']});
+const lato = Lato({weight: ['300', '400', '700'], subsets: ['latin']});
 
 export const metadata: Metadata = {
   title: 'PeePooBoo',
@@ -20,7 +20,12 @@ export const metadata: Metadata = {
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en">
-      <body style={{margin: 0}} className={inter.className}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+      </head>
+      <body style={{margin: 0}} className={lato.className}>
         <StyledComponentsRegistry>{children}</StyledComponentsRegistry>
         <Analytics />
       </body>

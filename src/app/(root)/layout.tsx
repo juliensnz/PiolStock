@@ -12,11 +12,22 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
     ${CommonStyle};
+    font-family: 'Lato', Helvetica Neue;
+    background: white;
   }
 
   * {
     box-sizing: border-box;
-    font-family: 'Lato', sans-serif !important;
+    font-family: 'Lato', Helvetica Neue;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .firebase-emulator-warning {
+    display: none;
   }
 `;
 
@@ -33,13 +44,12 @@ const Container = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  position: fixed;
 `;
 
 const Content = styled.div`
-  overflow: hidden;
-  height: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Layout = ({children}: {children: ReactNode}) => {
