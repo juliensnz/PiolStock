@@ -39,7 +39,7 @@ const PageTop = styled.div`
 `;
 
 const StockCell = styled(Table.Cell)`
-  width: 270px;
+  // width: 270px;
   padding-right: 20px;
 `;
 
