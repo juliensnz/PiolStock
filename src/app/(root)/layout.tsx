@@ -1,9 +1,19 @@
 'use client';
 
-import styled from 'styled-components';
+import {CommonStyle, pimTheme} from 'akeneo-design-system';
+
+import styled, {ThemeProvider, createGlobalStyle} from 'styled-components';
 import {ReactNode} from 'react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
+
+const GlobalStyle = createGlobalStyle`
+  body {
+    margin: 0;
+    padding: 0;
+    ${CommonStyle};
+  }
+`;
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,18 +34,20 @@ const Container = styled.div`
 
 const Content = styled.div`
   overflow: hidden;
-  color: white;
   height: 100%;
 `;
 
 const Layout = ({children}: {children: ReactNode}) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen={false} />
-      <Container>
-        <Content>{children}</Content>
-      </Container>
-    </QueryClientProvider>
+    <ThemeProvider theme={pimTheme}>
+      <GlobalStyle />
+      <QueryClientProvider client={queryClient}>
+        <ReactQueryDevtools initialIsOpen={false} />
+        <Container>
+          <Content>{children}</Content>
+        </Container>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 };
 
