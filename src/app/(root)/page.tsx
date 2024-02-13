@@ -1,9 +1,11 @@
 'use client';
 
 import {Stock} from '@/app/(root)/components/Stock';
+import {useAddProducts, useProducts, useUpdateStock} from '@/app/(root)/components/hooks/useProducts';
+import {Product, createProducts} from '@/domain/model/Product';
 import {Table, Breadcrumb, getColor} from 'akeneo-design-system';
 import Image from 'next/image';
-import {useState} from 'react';
+import {useCallback} from 'react';
 import styled from 'styled-components';
 
 const PageTitle = styled.h1`
@@ -25,16 +27,41 @@ const PageHeaderSticky = styled.div`
   margin-bottom: 30px;
 `;
 
+const PageTop = styled.div`
+  display: flex;
+`;
+
 export default function Home() {
-  const [value, setValue] = useState(10);
+  const {data} = useProducts();
+  const addProducts = useAddProducts();
+  const updateStock = useUpdateStock();
+
+  const updateProductStock = useCallback(
+    (productId: string) => (stock: number) => updateStock(productId, stock),
+    [updateStock]
+  );
 
   return (
     <Container>
       <PageHeaderSticky>
         <div>
-          <Breadcrumb>
-            <Breadcrumb.Step>Stock</Breadcrumb.Step>
-          </Breadcrumb>
+          <PageTop>
+            <Breadcrumb>
+              <Breadcrumb.Step>Stock</Breadcrumb.Step>
+            </Breadcrumb>
+            <button
+              onClick={() =>
+                addProducts(
+                  createProducts(
+                    'My product',
+                    'https://scontent.cdninstagram.com/v/t51.2885-15/427172601_392548660150973_4785277053165070796_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0Mzkuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&_nc_ohc=ITX5LORhlfkAX_awrz4&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzMwMTk5MzY0MjI1NTAxNTQ2NQ%3D%3D.2-ccb7-5&oh=00_AfA-Ph98Fl_xGvJ0C6apwhJWCdPdhb7W3YeWnvIvjAXiuQ&oe=65D0B718&_nc_sid=10d13b'
+                  )
+                )
+              }
+            >
+              Add product
+            </button>
+          </PageTop>
           <PageTitle>Product stock</PageTitle>
         </div>
       </PageHeaderSticky>
@@ -46,186 +73,22 @@ export default function Home() {
           <Table.HeaderCell>Stock</Table.HeaderCell>
         </Table.Header>
         <Table.Body>
-          <Table.Row>
-            <Table.Cell>
-              <Image
-                src="https://scontent.cdninstagram.com/v/t51.2885-15/427172601_392548660150973_4785277053165070796_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0Mzkuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&_nc_ohc=ITX5LORhlfkAX_awrz4&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzMwMTk5MzY0MjI1NTAxNTQ2NQ%3D%3D.2-ccb7-5&oh=00_AfA-Ph98Fl_xGvJ0C6apwhJWCdPdhb7W3YeWnvIvjAXiuQ&oe=65D0B718&_nc_sid=10d13b"
-                alt="Illustration image"
-                width={100}
-                height={100}
-              />
-            </Table.Cell>
-            <Table.Cell>Des fleurs</Table.Cell>
-            <Table.Cell>A4</Table.Cell>
-            <Table.Cell>
-              <Stock value={value} onChange={setValue} increment={4} />
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>
-              <Image
-                src="https://scontent.cdninstagram.com/v/t51.2885-15/427172601_392548660150973_4785277053165070796_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0Mzkuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&_nc_ohc=ITX5LORhlfkAX_awrz4&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzMwMTk5MzY0MjI1NTAxNTQ2NQ%3D%3D.2-ccb7-5&oh=00_AfA-Ph98Fl_xGvJ0C6apwhJWCdPdhb7W3YeWnvIvjAXiuQ&oe=65D0B718&_nc_sid=10d13b"
-                alt="Illustration image"
-                width={100}
-                height={100}
-              />
-            </Table.Cell>
-            <Table.Cell>Des fleurs</Table.Cell>
-            <Table.Cell>A4</Table.Cell>
-            <Table.Cell>
-              <Stock value={12} onChange={() => {}} increment={4} />
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>
-              <Image
-                src="https://scontent.cdninstagram.com/v/t51.2885-15/427172601_392548660150973_4785277053165070796_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0Mzkuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&_nc_ohc=ITX5LORhlfkAX_awrz4&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzMwMTk5MzY0MjI1NTAxNTQ2NQ%3D%3D.2-ccb7-5&oh=00_AfA-Ph98Fl_xGvJ0C6apwhJWCdPdhb7W3YeWnvIvjAXiuQ&oe=65D0B718&_nc_sid=10d13b"
-                alt="Illustration image"
-                width={100}
-                height={100}
-              />
-            </Table.Cell>
-            <Table.Cell>Des fleurs</Table.Cell>
-            <Table.Cell>A4</Table.Cell>
-            <Table.Cell>
-              <Stock value={12} onChange={() => {}} increment={4} />
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>
-              <Image
-                src="https://scontent.cdninstagram.com/v/t51.2885-15/427172601_392548660150973_4785277053165070796_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0Mzkuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&_nc_ohc=ITX5LORhlfkAX_awrz4&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzMwMTk5MzY0MjI1NTAxNTQ2NQ%3D%3D.2-ccb7-5&oh=00_AfA-Ph98Fl_xGvJ0C6apwhJWCdPdhb7W3YeWnvIvjAXiuQ&oe=65D0B718&_nc_sid=10d13b"
-                alt="Illustration image"
-                width={100}
-                height={100}
-              />
-            </Table.Cell>
-            <Table.Cell>Des fleurs</Table.Cell>
-            <Table.Cell>A4</Table.Cell>
-            <Table.Cell>
-              <Stock value={12} onChange={() => {}} increment={4} />
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>
-              <Image
-                src="https://scontent.cdninstagram.com/v/t51.2885-15/427172601_392548660150973_4785277053165070796_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0Mzkuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&_nc_ohc=ITX5LORhlfkAX_awrz4&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzMwMTk5MzY0MjI1NTAxNTQ2NQ%3D%3D.2-ccb7-5&oh=00_AfA-Ph98Fl_xGvJ0C6apwhJWCdPdhb7W3YeWnvIvjAXiuQ&oe=65D0B718&_nc_sid=10d13b"
-                alt="Illustration image"
-                width={100}
-                height={100}
-              />
-            </Table.Cell>
-            <Table.Cell>Des fleurs</Table.Cell>
-            <Table.Cell>A4</Table.Cell>
-            <Table.Cell>
-              <Stock value={12} onChange={() => {}} increment={4} />
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>
-              <Image
-                src="https://scontent.cdninstagram.com/v/t51.2885-15/427172601_392548660150973_4785277053165070796_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0Mzkuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&_nc_ohc=ITX5LORhlfkAX_awrz4&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzMwMTk5MzY0MjI1NTAxNTQ2NQ%3D%3D.2-ccb7-5&oh=00_AfA-Ph98Fl_xGvJ0C6apwhJWCdPdhb7W3YeWnvIvjAXiuQ&oe=65D0B718&_nc_sid=10d13b"
-                alt="Illustration image"
-                width={100}
-                height={100}
-              />
-            </Table.Cell>
-            <Table.Cell>Des fleurs</Table.Cell>
-            <Table.Cell>A4</Table.Cell>
-            <Table.Cell>
-              <Stock value={12} onChange={() => {}} increment={4} />
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>
-              <Image
-                src="https://scontent.cdninstagram.com/v/t51.2885-15/427172601_392548660150973_4785277053165070796_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0Mzkuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&_nc_ohc=ITX5LORhlfkAX_awrz4&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzMwMTk5MzY0MjI1NTAxNTQ2NQ%3D%3D.2-ccb7-5&oh=00_AfA-Ph98Fl_xGvJ0C6apwhJWCdPdhb7W3YeWnvIvjAXiuQ&oe=65D0B718&_nc_sid=10d13b"
-                alt="Illustration image"
-                width={100}
-                height={100}
-              />
-            </Table.Cell>
-            <Table.Cell>Des fleurs</Table.Cell>
-            <Table.Cell>A4</Table.Cell>
-            <Table.Cell>
-              <Stock value={12} onChange={() => {}} increment={4} />
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>
-              <Image
-                src="https://scontent.cdninstagram.com/v/t51.2885-15/427172601_392548660150973_4785277053165070796_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0Mzkuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&_nc_ohc=ITX5LORhlfkAX_awrz4&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzMwMTk5MzY0MjI1NTAxNTQ2NQ%3D%3D.2-ccb7-5&oh=00_AfA-Ph98Fl_xGvJ0C6apwhJWCdPdhb7W3YeWnvIvjAXiuQ&oe=65D0B718&_nc_sid=10d13b"
-                alt="Illustration image"
-                width={100}
-                height={100}
-              />
-            </Table.Cell>
-            <Table.Cell>Des fleurs</Table.Cell>
-            <Table.Cell>A4</Table.Cell>
-            <Table.Cell>
-              <Stock value={12} onChange={() => {}} increment={4} />
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>
-              <Image
-                src="https://scontent.cdninstagram.com/v/t51.2885-15/427172601_392548660150973_4785277053165070796_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0Mzkuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&_nc_ohc=ITX5LORhlfkAX_awrz4&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzMwMTk5MzY0MjI1NTAxNTQ2NQ%3D%3D.2-ccb7-5&oh=00_AfA-Ph98Fl_xGvJ0C6apwhJWCdPdhb7W3YeWnvIvjAXiuQ&oe=65D0B718&_nc_sid=10d13b"
-                alt="Illustration image"
-                width={100}
-                height={100}
-              />
-            </Table.Cell>
-            <Table.Cell>Des fleurs</Table.Cell>
-            <Table.Cell>A4</Table.Cell>
-            <Table.Cell>
-              <Stock value={12} onChange={() => {}} increment={4} />
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>
-              <Image
-                src="https://scontent.cdninstagram.com/v/t51.2885-15/427172601_392548660150973_4785277053165070796_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0Mzkuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&_nc_ohc=ITX5LORhlfkAX_awrz4&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzMwMTk5MzY0MjI1NTAxNTQ2NQ%3D%3D.2-ccb7-5&oh=00_AfA-Ph98Fl_xGvJ0C6apwhJWCdPdhb7W3YeWnvIvjAXiuQ&oe=65D0B718&_nc_sid=10d13b"
-                alt="Illustration image"
-                width={100}
-                height={100}
-              />
-            </Table.Cell>
-            <Table.Cell>Des fleurs</Table.Cell>
-            <Table.Cell>A4</Table.Cell>
-            <Table.Cell>
-              <Stock value={12} onChange={() => {}} increment={4} />
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>
-              <Image
-                src="https://scontent.cdninstagram.com/v/t51.2885-15/427172601_392548660150973_4785277053165070796_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0Mzkuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&_nc_ohc=ITX5LORhlfkAX_awrz4&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzMwMTk5MzY0MjI1NTAxNTQ2NQ%3D%3D.2-ccb7-5&oh=00_AfA-Ph98Fl_xGvJ0C6apwhJWCdPdhb7W3YeWnvIvjAXiuQ&oe=65D0B718&_nc_sid=10d13b"
-                alt="Illustration image"
-                width={100}
-                height={100}
-              />
-            </Table.Cell>
-            <Table.Cell>Des fleurs</Table.Cell>
-            <Table.Cell>A4</Table.Cell>
-            <Table.Cell>
-              <Stock value={12} onChange={() => {}} increment={4} />
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>
-              <Image
-                src="https://scontent.cdninstagram.com/v/t51.2885-15/427172601_392548660150973_4785277053165070796_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE0Mzkuc2RyIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&_nc_ohc=ITX5LORhlfkAX_awrz4&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzMwMTk5MzY0MjI1NTAxNTQ2NQ%3D%3D.2-ccb7-5&oh=00_AfA-Ph98Fl_xGvJ0C6apwhJWCdPdhb7W3YeWnvIvjAXiuQ&oe=65D0B718&_nc_sid=10d13b"
-                alt="Illustration image"
-                width={100}
-                height={100}
-              />
-            </Table.Cell>
-            <Table.Cell>Des fleurs</Table.Cell>
-            <Table.Cell>A4</Table.Cell>
-            <Table.Cell>
-              <Stock value={12} onChange={() => {}} increment={4} />
-            </Table.Cell>
-          </Table.Row>
+          {data?.docs.map(doc => {
+            const product = doc.data() as Product;
+
+            return (
+              <Table.Row key={product.id}>
+                <Table.Cell>
+                  <Image src={product.image} alt="Illustration image" width={100} height={100} />
+                </Table.Cell>
+                <Table.Cell>{product.name}</Table.Cell>
+                <Table.Cell>{product.format}</Table.Cell>
+                <Table.Cell>
+                  <Stock value={product.stock} onChange={updateProductStock(product.id)} increment={4} />
+                </Table.Cell>
+              </Table.Row>
+            );
+          })}
         </Table.Body>
       </Table>
     </Container>

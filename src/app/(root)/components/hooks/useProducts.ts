@@ -1,4 +1,4 @@
-import {Product} from '@/domain/model/Product';
+import {Product, ProductId} from '@/domain/model/Product';
 import {productRepository} from '@/infrastructure/ProductRepository';
 import {useFirestoreQuery} from '@/lib/useFirestoreQuery/useFirestoreQuery';
 import {useCallback} from 'react';
@@ -13,14 +13,23 @@ const useProducts = () => {
   return query;
 };
 
-const useAddProduct = () => {
-  return useCallback(async (product: Omit<Product, 'id'>): Promise<Product> => {
-    const result = await productRepository.addProduct(product);
+const useAddProducts = () => {
+  return useCallback(async (products: Omit<Product, 'id'>[]): Promise<Product[]> => {
+    const result = await productRepository.addProducts(products);
 
     if (result.isError()) throw result.getError();
 
     return result.get();
   }, []);
 };
+const useUpdateStock = () => {
+  return useCallback(async (productId: ProductId, stock: number): Promise<void> => {
+    const result = await productRepository.updateStock(productId, stock);
 
-export {useProducts, useAddProduct};
+    if (result.isError()) throw result.getError();
+
+    return;
+  }, []);
+};
+
+export {useProducts, useUpdateStock, useAddProducts};
