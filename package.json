@@ -33,6 +33,6 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "webpack": "^5.88.2"
+    "webpack": "^5.90.2"
   }
 }
