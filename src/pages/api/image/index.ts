@@ -6,6 +6,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     headers: {},
   });
   const data = await response.json();
+  console.log(data);
 
   res.status(200).json({url: data.graphql.shortcode_media.display_url});
 };
