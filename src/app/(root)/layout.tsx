@@ -1,6 +1,6 @@
 'use client';
 
-import {CommonStyle, pimTheme} from 'akeneo-design-system';
+import {CommonStyle, sharedCatalogsTheme} from 'akeneo-design-system';
 
 import styled, {ThemeProvider, createGlobalStyle} from 'styled-components';
 import {ReactNode} from 'react';
@@ -54,7 +54,7 @@ const Content = styled.div`
 
 const Layout = ({children}: {children: ReactNode}) => {
   return (
-    <ThemeProvider theme={pimTheme}>
+    <ThemeProvider theme={sharedCatalogsTheme}>
       <GlobalStyle />
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools initialIsOpen={false} />
