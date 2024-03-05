@@ -13,10 +13,13 @@ const useInstagramUrl = (url: string) => {
 
     const fetchInstagramUrl = async () => {
       try {
-        const result = await fetch(`/api/image/?url=${debouncedUrl.split('?')[0]}`);
-        const data = await result.json();
+        const url = debouncedUrl.split('?')[0];
+        const response = await fetch(`${url}?__a=1&__d=dis` as string, {
+          headers: {},
+        });
+        const data = await response.json();
 
-        setInstagramUrl(data.url);
+        setInstagramUrl(data.graphql.shortcode_media.display_url);
       } catch (error) {
         setInstagramUrl(null);
       }
