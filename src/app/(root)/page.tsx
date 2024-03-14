@@ -82,7 +82,7 @@ export default function Home() {
               <Table.Row key={product.id}>
                 <ImageCell>
                   <Image
-                    src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images/${product.image}?alt=media`}
+                    src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F${product.image}?alt=media`}
                     alt="Illustration image"
                     width={100}
                     height={100}
