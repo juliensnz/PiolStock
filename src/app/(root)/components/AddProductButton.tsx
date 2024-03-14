@@ -76,7 +76,7 @@ const AddProductModal = ({handleClose}: {handleClose: () => void}) => {
       }
     >
       <Container>
-        <Field label="Instagram post">
+        <Field label="Image">
           <SelectInput
             emptyResultLabel="No image found"
             onChange={imageName => {
