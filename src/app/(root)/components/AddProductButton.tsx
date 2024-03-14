@@ -37,6 +37,8 @@ const AddProductButton = () => {
   );
 };
 
+const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
+
 const AddProductModal = ({handleClose}: {handleClose: () => void}) => {
   const [imageName, setImageName] = useState('');
   const [name, setName] = useState('');
@@ -63,7 +65,7 @@ const AddProductModal = ({handleClose}: {handleClose: () => void}) => {
       illustration={
         imageName ? (
           <Image
-            src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images/${imageName}?alt=media`}
+            src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F${imageName}?alt=media`}
             width={220}
             height={220}
             alt="Illustration image"
@@ -74,13 +76,15 @@ const AddProductModal = ({handleClose}: {handleClose: () => void}) => {
       }
     >
       <Container>
-        <Field label="Name">
-          <TextInput value={name} onChange={setName} placeholder="Plage" />
-        </Field>
         <Field label="Instagram post">
           <SelectInput
             emptyResultLabel="No image found"
-            onChange={setImageName}
+            onChange={imageName => {
+              setImageName(imageName);
+              if (!name) {
+                setName(capitalize(imageName.split('.')[0].replace('_', ' ')));
+              }
+            }}
             placeholder="Please chose an image"
             value={imageName}
             clearable={false}
@@ -88,10 +92,13 @@ const AddProductModal = ({handleClose}: {handleClose: () => void}) => {
           >
             {images.map(image => (
               <SelectInput.Option key={image} title={image} value={image}>
-                {image.split('.')[0].replace('_', ' ')}
+                {capitalize(image.split('.')[0].replace('_', ' '))}
               </SelectInput.Option>
             ))}
           </SelectInput>
+        </Field>
+        <Field label="Name">
+          <TextInput value={name} onChange={setName} placeholder="Plage" />
         </Field>
         <Field label="Multiple sizes">
           <BooleanInput
