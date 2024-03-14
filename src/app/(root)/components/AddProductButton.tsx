@@ -1,4 +1,4 @@
-import {useInstagramUrl} from '@/app/(root)/components/hooks/useInstagramUrl';
+import {useImages} from '@/app/(root)/components/hooks/useImages';
 import {useAddProducts} from '@/app/(root)/components/hooks/useProducts';
 import {createProduct, createProducts} from '@/domain/model/Product';
 import {
@@ -7,6 +7,7 @@ import {
   ChannelsIllustration,
   Field,
   Modal,
+  SelectInput,
   TextInput,
   useBooleanState,
 } from 'akeneo-design-system';
@@ -37,33 +38,36 @@ const AddProductButton = () => {
 };
 
 const AddProductModal = ({handleClose}: {handleClose: () => void}) => {
-  const [url, setUrl] = useState('');
+  const [imageName, setImageName] = useState('');
   const [name, setName] = useState('');
   const [multipleSizes, setMultipleSizes] = useState(true);
-  const instagramUrl = useInstagramUrl(url);
+  const images = useImages();
 
   const addProducts = useAddProducts();
 
   const handleCreateProduct = useCallback(async () => {
-    if (!name || !instagramUrl) {
+    if (!name || !imageName) {
       return;
     }
 
-    const products = multipleSizes
-      ? createProducts(name, instagramUrl)
-      : [createProduct(name, instagramUrl, 'UNISIZE')];
+    const products = multipleSizes ? createProducts(name, imageName) : [createProduct(name, imageName, 'UNISIZE')];
 
     await addProducts(products);
     handleClose();
-  }, [addProducts, instagramUrl, multipleSizes, name, handleClose]);
+  }, [addProducts, imageName, multipleSizes, name, handleClose]);
 
   return (
     <Modal
       closeTitle="Close modal"
       onClose={handleClose}
       illustration={
-        instagramUrl ? (
-          <Image src={instagramUrl} width={220} height={220} alt="Illustration image" />
+        imageName ? (
+          <Image
+            src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images/${imageName}?alt=media`}
+            width={220}
+            height={220}
+            alt="Illustration image"
+          />
         ) : (
           <ChannelsIllustration />
         )
@@ -74,7 +78,20 @@ const AddProductModal = ({handleClose}: {handleClose: () => void}) => {
           <TextInput value={name} onChange={setName} placeholder="Plage" />
         </Field>
         <Field label="Instagram post">
-          <TextInput value={url} onChange={setUrl} placeholder="https://www.instagram.com/p/C3TCboMN6WF/" />
+          <SelectInput
+            emptyResultLabel="No image found"
+            onChange={setImageName}
+            placeholder="Please chose an image"
+            value={imageName}
+            clearable={false}
+            openLabel=""
+          >
+            {images.map(image => (
+              <SelectInput.Option key={image} title={image} value={image}>
+                {image.split('.')[0].replace('_', ' ')}
+              </SelectInput.Option>
+            ))}
+          </SelectInput>
         </Field>
         <Field label="Multiple sizes">
           <BooleanInput

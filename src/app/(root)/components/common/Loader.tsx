@@ -1,4 +1,4 @@
-import {Override} from '@/domain/model/Override';
+import {Override} from '@/domain/model/common/Override';
 import {SVGProps, RefObject} from 'react';
 
 type IconProps = Override<

@@ -81,7 +81,12 @@ export default function Home() {
             return (
               <Table.Row key={product.id}>
                 <ImageCell>
-                  <Image src={product.image} alt="Illustration image" width={100} height={100} />
+                  <Image
+                    src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images/${product.image}?alt=media`}
+                    alt="Illustration image"
+                    width={100}
+                    height={100}
+                  />
                 </ImageCell>
                 <Table.Cell rowTitle={true}>{product.name}</Table.Cell>
                 <Table.Cell>{product.format}</Table.Cell>

@@ -24,7 +24,7 @@ module.exports = withPlugins([withTM, [withImages]], {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '*.cdninstagram.com',
+        hostname: 'firebasestorage.googleapis.com',
         port: '',
       },
     ],

@@ -1,6 +1,6 @@
 import {Product, ProductId} from '@/domain/model/Product';
-import {Either, Error, Result} from '@/domain/model/Result';
-import {RuntimeError} from '@/domain/model/RuntimeError';
+import {Either, Error, Result} from '@/domain/model/common/Result';
+import {RuntimeError} from '@/domain/model/common/RuntimeError';
 import {firebaseApp} from '@/lib/firebase';
 import {
   getFirestore,
