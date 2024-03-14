@@ -4,9 +4,9 @@ import {AddProductButton} from '@/app/(root)/components/AddProductButton';
 import {Stock} from '@/app/(root)/components/Stock';
 import {useProducts, useUpdateStock} from '@/app/(root)/components/hooks/useProducts';
 import {Product} from '@/domain/model/Product';
-import {Table, Breadcrumb, getColor} from 'akeneo-design-system';
+import {Table, Breadcrumb, getColor, Search} from 'akeneo-design-system';
 import Image from 'next/image';
-import {useCallback} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import styled from 'styled-components';
 
 const Spacer = styled.div`
@@ -48,11 +48,22 @@ const ImageCell = styled(Table.Cell)`
 export default function Home() {
   const {data} = useProducts();
   const updateStock = useUpdateStock();
+  const [search, setSearch] = useState('');
 
   const updateProductStock = useCallback(
     (productId: string) => (stock: number) => updateStock(productId, stock),
     [updateStock]
   );
+
+  const products = useMemo(() => data?.docs.map(doc => doc.data() as Product), [data]);
+  const filteredProducts = useMemo(
+    () => products?.filter(product => product.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) ?? [],
+    [products, search]
+  );
+
+  if (undefined === products) {
+    return null;
+  }
 
   return (
     <Container>
@@ -67,6 +78,9 @@ export default function Home() {
         </PageTop>
         <PageTitle>Product stock</PageTitle>
       </PageHeaderSticky>
+      <Search onSearchChange={setSearch} placeholder="Search" searchValue={search} title="Search">
+        <span>{filteredProducts.length} results</span>
+      </Search>
       <Table>
         <Table.Header sticky={70}>
           <Table.HeaderCell>Illustration</Table.HeaderCell>
@@ -75,9 +89,7 @@ export default function Home() {
           <Table.HeaderCell>Stock</Table.HeaderCell>
         </Table.Header>
         <Table.Body>
-          {data?.docs.map(doc => {
-            const product = doc.data() as Product;
-
+          {filteredProducts.map(product => {
             return (
               <Table.Row key={product.id}>
                 <ImageCell>

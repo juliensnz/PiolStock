@@ -66,17 +66,17 @@ const Stock = ({value, onChange, increment = 4}: StockProps) => {
 
   return (
     <Container>
-      <ChangeButton color="red" gradient={140} onClick={() => handleChange(value - increment)}>
+      <ChangeButton tabIndex={-1} color="red" gradient={140} onClick={() => handleChange(value - increment)}>
         -{increment}
       </ChangeButton>
-      <ChangeButton color="red" gradient={100} onClick={() => handleChange(value - 1)}>
+      <ChangeButton tabIndex={-1} color="red" gradient={100} onClick={() => handleChange(value - 1)}>
         -1
       </ChangeButton>
       <NumberInput type="number" value={value} onChange={event => handleChange(Number(event.target.value))} />
-      <ChangeButton color="green" gradient={100} onClick={() => handleChange(value + 1)}>
+      <ChangeButton tabIndex={-1} color="green" gradient={100} onClick={() => handleChange(value + 1)}>
         +1
       </ChangeButton>
-      <ChangeButton color="green" gradient={140} onClick={() => handleChange(value + increment)}>
+      <ChangeButton tabIndex={-1} color="green" gradient={140} onClick={() => handleChange(value + increment)}>
         +{increment}
       </ChangeButton>
     </Container>
