@@ -6,12 +6,12 @@ import {
   Button,
   ChannelsIllustration,
   Field,
+  Image,
   Modal,
   SelectInput,
   TextInput,
   useBooleanState,
 } from 'akeneo-design-system';
-import Image from 'next/image';
 import {useCallback, useState} from 'react';
 import styled from 'styled-components';
 
@@ -36,6 +36,12 @@ const AddProductButton = () => {
     </>
   );
 };
+
+const SelectContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
 
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
@@ -92,7 +98,15 @@ const AddProductModal = ({handleClose}: {handleClose: () => void}) => {
           >
             {images.map(image => (
               <SelectInput.Option key={image} title={image} value={image}>
-                {capitalize(image.split('.')[0].replace('_', ' '))}
+                <SelectContainer>
+                  <Image
+                    src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F${image}?alt=media`}
+                    width={30}
+                    height={30}
+                    alt="Illustration image"
+                  />
+                  {capitalize(image.split('.')[0].replace('_', ' '))}
+                </SelectContainer>
               </SelectInput.Option>
             ))}
           </SelectInput>
