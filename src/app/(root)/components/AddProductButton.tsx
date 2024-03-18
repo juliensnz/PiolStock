@@ -26,13 +26,13 @@ const BottomButtons = styled(Modal.BottomButtons)`
   justify-content: flex-end;
 `;
 
-const AddProductButton = () => {
+const AddProductButton = ({onAddProduct}: {onAddProduct: (productName: string) => void}) => {
   const [isOpen, open, close] = useBooleanState(false);
 
   return (
     <>
       <Button onClick={open}>Add Product</Button>
-      {isOpen && <AddProductModal handleClose={close} />}
+      {isOpen && <AddProductModal onAddProduct={onAddProduct} handleClose={close} />}
     </>
   );
 };
@@ -45,7 +45,13 @@ const SelectContainer = styled.div`
 
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
-const AddProductModal = ({handleClose}: {handleClose: () => void}) => {
+const AddProductModal = ({
+  handleClose,
+  onAddProduct,
+}: {
+  handleClose: () => void;
+  onAddProduct: (productName: string) => void;
+}) => {
   const [imageName, setImageName] = useState('');
   const [name, setName] = useState('');
   const [multipleSizes, setMultipleSizes] = useState(true);
@@ -61,8 +67,9 @@ const AddProductModal = ({handleClose}: {handleClose: () => void}) => {
     const products = multipleSizes ? createProducts(name, imageName) : [createProduct(name, imageName, 'UNISIZE')];
 
     await addProducts(products);
+    onAddProduct(name);
     handleClose();
-  }, [addProducts, imageName, multipleSizes, name, handleClose]);
+  }, [onAddProduct, addProducts, imageName, multipleSizes, name, handleClose]);
 
   return (
     <Modal

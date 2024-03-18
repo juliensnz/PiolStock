@@ -61,6 +61,13 @@ export default function Home() {
     [products, search]
   );
 
+  const handleAddProduct = useCallback(
+    (productName: string) => {
+      setSearch(productName);
+    },
+    [setSearch]
+  );
+
   if (undefined === products) {
     return null;
   }
@@ -74,7 +81,7 @@ export default function Home() {
           </Breadcrumb>
           <Spacer />
 
-          <AddProductButton />
+          <AddProductButton onAddProduct={handleAddProduct} />
         </PageTop>
         <PageTitle>Product stock</PageTitle>
       </PageHeaderSticky>
