@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@firebase/firestore": "^4.1.0",
+    "@firebase/firestore": "^4.5.0",
     "@tanstack/react-query": "^4.32.6",
     "@tanstack/react-query-devtools": "^4.32.6",
     "@types/node": "20.11.25",
