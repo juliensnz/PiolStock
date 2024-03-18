@@ -12,7 +12,7 @@
     "@firebase/firestore": "^4.1.0",
     "@tanstack/react-query": "^4.32.6",
     "@tanstack/react-query-devtools": "^4.32.6",
-    "@types/node": "20.11.25",
+    "@types/node": "20.11.28",
     "@types/react": "18.2.55",
     "@types/react-dom": "18.2.21",
     "@types/uuid": "^9.0.2",
