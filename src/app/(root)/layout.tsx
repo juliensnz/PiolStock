@@ -6,6 +6,8 @@ import styled, {ThemeProvider, createGlobalStyle} from 'styled-components';
 import {ReactNode} from 'react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
+import {MENU_WIDTH, Menu} from '@/app/(root)/components/Menu';
+import {IS_MOBILE} from '@/app/(root)/components/theme';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -40,16 +42,24 @@ const queryClient = new QueryClient({
 });
 
 const Container = styled.div`
-  width: 100vw;
-  height: 100vh;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  height: 100vh;
+
+  ${IS_MOBILE} {
+    flex-direction: column-reverse;
+  }
 `;
 
 const Content = styled.div`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+  background-color: white;
+  flex: 1;
+  margin: 0 20px 0 ${MENU_WIDTH + 20}px;
+
+  ${IS_MOBILE} {
+    margin: 0 20px;
+    overflow: hidden;
+  }
 `;
 
 const Layout = ({children}: {children: ReactNode}) => {
@@ -59,6 +69,7 @@ const Layout = ({children}: {children: ReactNode}) => {
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools initialIsOpen={false} />
         <Container>
+          <Menu />
           <Content>{children}</Content>
         </Container>
       </QueryClientProvider>

@@ -18,7 +18,7 @@ const PageTitle = styled.h1`
 `;
 
 const Container = styled.div`
-  margin: 10px 10px 10px 10px;
+  margin: 10px 10px 10px 0;
   background-color: white;
   flex: 1;
 `;
@@ -39,7 +39,13 @@ const PageTop = styled.div`
   width: 100%;
 `;
 
-const StockCell = styled(Table.Cell)``;
+const NameCell = styled(Table.Cell)``;
+
+const StockCell = styled(Table.Cell)`
+  width: 0.1%;
+  white-space: nowrap;
+  max-width: 1000px;
+`;
 
 const ImageCell = styled(Table.Cell)`
   width: 150px;
@@ -107,7 +113,7 @@ export default function Home() {
                     height={100}
                   />
                 </ImageCell>
-                <Table.Cell rowTitle={true}>{product.name}</Table.Cell>
+                <NameCell rowTitle={true}>{product.name}</NameCell>
                 <Table.Cell>{product.format}</Table.Cell>
                 <StockCell>
                   <Stock value={product.stock} onChange={updateProductStock(product.id)} increment={4} />
