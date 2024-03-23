@@ -1,6 +1,10 @@
 'use client';
 
-import {getColor, Breadcrumb} from 'akeneo-design-system';
+import {AddMarketButton} from '@/app/(root)/market/components/AddMarketButton';
+import {useMarkets} from '@/app/(root)/market/components/hooks/useMarkets';
+import {Market} from '@/domain/model/Market';
+import {getColor, Breadcrumb, Table} from 'akeneo-design-system';
+import {useMemo} from 'react';
 import styled from 'styled-components';
 
 const Spacer = styled.div`
@@ -34,6 +38,13 @@ const PageTop = styled.div`
 `;
 
 const Market = () => {
+  const {data} = useMarkets();
+  const markets = useMemo(() => data?.docs.map(doc => doc.data() as Market), [data]);
+
+  if (undefined === markets) {
+    return null;
+  }
+
   return (
     <Container>
       <PageHeaderSticky>
@@ -42,10 +53,28 @@ const Market = () => {
             <Breadcrumb.Step>Market</Breadcrumb.Step>
           </Breadcrumb>
           <Spacer />
-          <AddSaleButton />
+          <AddMarketButton />
         </PageTop>
         <PageTitle>Market</PageTitle>
       </PageHeaderSticky>
+      <Table>
+        <Table.Header sticky={70}>
+          <Table.HeaderCell>Name</Table.HeaderCell>
+          <Table.HeaderCell>Date</Table.HeaderCell>
+          <Table.HeaderCell>Revenue</Table.HeaderCell>
+        </Table.Header>
+        <Table.Body>
+          {markets.map(market => {
+            return (
+              <Table.Row key={market.id}>
+                <Table.Cell rowTitle={true}>{market.name}</Table.Cell>
+                <Table.Cell>{market.date}</Table.Cell>
+                <Table.Cell>12€</Table.Cell>
+              </Table.Row>
+            );
+          })}
+        </Table.Body>
+      </Table>
     </Container>
   );
 };

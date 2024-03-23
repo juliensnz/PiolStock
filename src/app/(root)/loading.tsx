@@ -14,7 +14,7 @@ const Container = styled.div`
 const Loading = () => {
   return (
     <Container>
-      <Loader color="#000" size={50} />
+      <Loader color="#000" size={20} />
     </Container>
   );
 };
