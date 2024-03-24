@@ -1,7 +1,7 @@
 import {Market, MarketId, Sale} from '@/domain/model/Market';
 import {marketRepository} from '@/infrastructure/MarketRepository';
 import {useFirestoreQuery} from '@/lib/useFirestoreQuery/useFirestoreQuery';
-import {useCallback, useMemo} from 'react';
+import {useMemo} from 'react';
 
 const useMarkets = () => {
   const ref = marketRepository.getRef();

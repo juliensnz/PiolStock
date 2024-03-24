@@ -86,7 +86,7 @@ const marketRepositoryCreator = ({db}: {db: Firestore}) => ({
   },
   getRef: () => {
     try {
-      const q = query(collection(db, 'markets'), orderBy('createdAt', 'asc'));
+      const q = query(collection(db, 'markets'), orderBy('date', 'desc'));
 
       return Result.Ok(q);
     } catch (error) {
@@ -99,7 +99,7 @@ const marketRepositoryCreator = ({db}: {db: Firestore}) => ({
   },
   streamMarkets: (updateMarkets: (markets: Market[]) => void) => {
     try {
-      const q = query(collection(db, 'markets'), orderBy('createdAt', 'asc'));
+      const q = query(collection(db, 'markets'), orderBy('date', 'desc'));
       const unsubscribe = onSnapshot(q, querySnapshot => {
         const markets: Market[] = [];
         querySnapshot.forEach(doc => {

@@ -1,4 +1,5 @@
 import {Product} from '@/domain/model/Product';
+import {createDate} from '@/domain/model/common/date';
 
 type ItemId = string;
 type Item = {
@@ -16,12 +17,12 @@ type MarketId = string;
 type Market = {
   id: MarketId;
   name: string;
-  date: string;
+  date: number;
   finished: boolean;
   sales: Sale[];
 };
 
-const createMarket = (name: string, date: string): Market => ({
+const createMarket = (name: string, date: number): Market => ({
   id: crypto.randomUUID(),
   name,
   date,
@@ -29,26 +30,31 @@ const createMarket = (name: string, date: string): Market => ({
   sales: [],
 });
 
-const createSale = (items: Item) => ({
+const createSale = () => ({
   id: crypto.randomUUID(),
+  date: new Date().getTime(),
   items: [],
 });
 
-const createItem = (product: Product, quantity: number = 1) => ({
+const createItem = (product: Product) => ({
   id: crypto.randomUUID(),
   product,
-  quantity,
 });
 
-const addItem = (sale: Sale, item: Item): Sale => ({
+const addItem = (sale: Sale, product: Product): Sale => ({
   ...sale,
-  items: [...sale.items, item],
+  items: [...sale.items, createItem(product)],
 });
 
-const removeItem = (sale: Sale, itemId: ItemId): Sale => ({
-  ...sale,
-  items: sale.items.filter(item => item.id !== itemId),
-});
+const removeItem = (sale: Sale, product: Product): Sale => {
+  const itemToRemove = sale.items.find(item => item.product.id === product.id);
+  if (undefined === itemToRemove) return sale;
+
+  return {
+    ...sale,
+    items: sale.items.toSpliced(sale.items.indexOf(itemToRemove), 1),
+  };
+};
 
 export {removeItem, addItem, createMarket, createSale, createItem};
 export type {Market, MarketId, Sale};

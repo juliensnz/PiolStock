@@ -1,5 +1,6 @@
 import {useMarketUpdater} from '@/app/(root)/market/components/hooks/useMarkets';
 import {Market, createMarket} from '@/domain/model/Market';
+import {createDate, fromString} from '@/domain/model/common/date';
 import {Button, ChannelsIllustration, DateInput, Field, Modal, TextInput, useBooleanState} from 'akeneo-design-system';
 import {useCallback, useState} from 'react';
 import styled from 'styled-components';
@@ -34,14 +35,14 @@ const AddMarketModal = ({
   onAddMarket?: (market: Market) => void;
 }) => {
   const [name, setName] = useState('');
-  const [date, setDate] = useState(new Date().toString());
+  const [date, setDate] = useState<string>(createDate());
   const {createMarket: persistCreatedMarket} = useMarketUpdater();
 
   const handleCreateMarket = useCallback(async () => {
     if (!date || !name) {
       return;
     }
-    const market = createMarket(name, date);
+    const market = createMarket(name, fromString(date));
 
     await persistCreatedMarket(market);
     onAddMarket?.(market);

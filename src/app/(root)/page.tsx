@@ -2,6 +2,7 @@
 
 import {AddProductButton} from '@/app/(root)/components/AddProductButton';
 import {Stock} from '@/app/(root)/components/Stock';
+import {PageHeaderSticky, PageTop} from '@/app/(root)/components/common/PageHeaderSticky';
 import {useProducts, useUpdateStock} from '@/app/(root)/components/hooks/useProducts';
 import {Product} from '@/domain/model/Product';
 import {Table, Breadcrumb, getColor, Search} from 'akeneo-design-system';
@@ -23,22 +24,6 @@ const Container = styled.div`
   flex: 1;
 `;
 
-const PageHeaderSticky = styled.div`
-  display: flex;
-  justify-content: space-between;
-  position: sticky;
-  flex-direction: column;
-  top: 0;
-  background: white;
-  margin-bottom: 30px;
-  padding-top: 20px;
-`;
-
-const PageTop = styled.div`
-  display: flex;
-  width: 100%;
-`;
-
 const NameCell = styled(Table.Cell)``;
 
 const StockCell = styled(Table.Cell)`
@@ -52,7 +37,6 @@ const ImageCell = styled(Table.Cell)`
 `;
 
 export default function Home() {
-  const {data} = useProducts();
   const updateStock = useUpdateStock();
   const [search, setSearch] = useState('');
 
@@ -61,6 +45,7 @@ export default function Home() {
     [updateStock]
   );
 
+  const {data} = useProducts();
   const products = useMemo(() => data?.docs.map(doc => doc.data() as Product), [data]);
   const filteredProducts = useMemo(
     () => products?.filter(product => product.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) ?? [],
