@@ -3,11 +3,12 @@
 import {AddProductButton} from '@/app/(root)/components/AddProductButton';
 import {MassAddButton} from '@/app/(root)/components/MassAddButton';
 import {EditProductButton} from '@/app/(root)/components/EditProductButton';
+import {FormatFilter} from '@/app/(root)/components/FormatFilter';
 import {FormatIcon} from '@/app/(root)/components/FormatIcon';
 import {Stock} from '@/app/(root)/components/Stock';
 import {useProducts, useUpdateStock} from '@/app/(root)/components/hooks/useProducts';
 import {useReservedStock} from '@/app/(root)/components/hooks/useOrders';
-import {Product, sortVariantsBySize} from '@/domain/model/Product';
+import {type Format, Product, sortVariantsBySize} from '@/domain/model/Product';
 import {Input} from '@/components/ui/input';
 import {Loader2, Search} from 'lucide-react';
 import Image from 'next/image';
@@ -18,7 +19,17 @@ export default function Home() {
   const updateStock = useUpdateStock();
   const reservedStock = useReservedStock();
   const [search, setSearch] = useState('');
+  const [selectedFormats, setSelectedFormats] = useState<Set<Format>>(new Set());
   const searchRef = useRef<HTMLInputElement>(null);
+
+  const toggleFormat = useCallback((format: Format) => {
+    setSelectedFormats(prev => {
+      const next = new Set(prev);
+      if (next.has(format)) next.delete(format);
+      else next.add(format);
+      return next;
+    });
+  }, []);
 
   const focusSearch = useCallback(() => {
     searchRef.current?.focus();
@@ -35,14 +46,25 @@ export default function Home() {
   );
 
   const products = useMemo(() => data?.docs.map(doc => doc.data() as Product), [data]);
-  const filteredProducts = useMemo(
-    () => products?.filter(product => product.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) ?? [],
-    [products, search]
+  const filteredProducts = useMemo(() => {
+    const byName =
+      products?.filter(product => product.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) ?? [];
+    if (selectedFormats.size === 0) return byName;
+    return byName.filter(product => product.variants.some(v => selectedFormats.has(v.format)));
+  }, [products, search, selectedFormats]);
+
+  const visibleVariants = useCallback(
+    (variants: ReturnType<typeof sortVariantsBySize>) => {
+      const sorted = sortVariantsBySize(variants);
+      if (selectedFormats.size === 0) return sorted;
+      return sorted.filter(v => selectedFormats.has(v.format));
+    },
+    [selectedFormats]
   );
 
   const variantCount = useMemo(
-    () => filteredProducts.reduce((sum, product) => sum + product.variants.length, 0),
-    [filteredProducts]
+    () => filteredProducts.reduce((sum, product) => sum + visibleVariants(product.variants).length, 0),
+    [filteredProducts, visibleVariants]
   );
 
   const handleAddProduct = useCallback(
@@ -71,18 +93,21 @@ export default function Home() {
             <AddProductButton onAddProduct={handleAddProduct} />
           </div>
         </div>
-        <div className="relative w-full">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            ref={searchRef}
-            placeholder="Search"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="pl-9 pr-24"
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-            {variantCount} results
-          </span>
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              ref={searchRef}
+              placeholder="Search"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="pl-9 pr-24"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              {variantCount} results
+            </span>
+          </div>
+          <FormatFilter selectedFormats={selectedFormats} onToggle={toggleFormat} />
         </div>
       </div>
       <div className="grid gap-4">
@@ -101,7 +126,7 @@ export default function Home() {
                 <EditProductButton product={product} />
               </div>
               <div className="flex flex-col gap-2">
-                {sortVariantsBySize(product.variants).map(variant => {
+                {visibleVariants(product.variants).map(variant => {
                   const reserved = reservedStock.get(variant.id) ?? 0;
                   return (
                     <div key={variant.id} className="flex items-center justify-end gap-3">
