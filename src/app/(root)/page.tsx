@@ -9,16 +9,25 @@ import {Product, sortVariantsBySize} from '@/domain/model/Product';
 import {Input} from '@/components/ui/input';
 import {Search} from 'lucide-react';
 import Image from 'next/image';
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 
 export default function Home() {
   const {data} = useProducts();
   const updateStock = useUpdateStock();
   const [search, setSearch] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  const focusSearch = useCallback(() => {
+    searchRef.current?.focus();
+    searchRef.current?.select();
+  }, []);
 
   const updateVariantStock = useCallback(
-    (productId: string, variantId: string) => (stock: number) => updateStock(productId, variantId, stock),
-    [updateStock]
+    (productId: string, variantId: string) => (stock: number) => {
+      updateStock(productId, variantId, stock);
+      focusSearch();
+    },
+    [updateStock, focusSearch]
   );
 
   const products = useMemo(() => data?.docs.map(doc => doc.data() as Product), [data]);
@@ -53,7 +62,7 @@ export default function Home() {
         </div>
         <div className="relative w-full">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} className="pl-9 pr-24" />
+          <Input ref={searchRef} placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} className="pl-9 pr-24" />
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
             {variantCount} results
           </span>
