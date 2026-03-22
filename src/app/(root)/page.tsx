@@ -44,20 +44,20 @@ export default function Home() {
   }
 
   return (
-    <div className="m-2.5 flex-1 bg-white">
-      <div className="sticky top-0 z-10 mb-8 flex flex-col justify-between bg-white pt-5">
+    <div className="mx-2.5 flex-1 bg-white">
+      <div className="sticky top-0 z-10 mb-6 flex flex-col gap-4 bg-white pt-5 pb-2">
         <div className="flex w-full">
           <h1 className="text-2xl font-bold text-primary">Product stock</h1>
           <div className="flex-1" />
           <AddProductButton onAddProduct={handleAddProduct} />
         </div>
-      </div>
-      <div className="relative mb-6 w-full">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} className="pl-9 pr-24" />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-          {variantCount} results
-        </span>
+        <div className="relative w-full">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} className="pl-9 pr-24" />
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+            {variantCount} results
+          </span>
+        </div>
       </div>
       <div className="grid gap-4">
         {filteredProducts.map(product => (
