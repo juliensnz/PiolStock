@@ -1,6 +1,7 @@
 'use client';
 
 import {AddProductButton} from '@/app/(root)/components/AddProductButton';
+import {FormatIcon} from '@/app/(root)/components/FormatIcon';
 import {Stock} from '@/app/(root)/components/Stock';
 import {useProducts, useUpdateStock} from '@/app/(root)/components/hooks/useProducts';
 import {Product} from '@/domain/model/Product';
@@ -68,6 +69,7 @@ export default function Home() {
               <TableRow key={product.id}>
                 <TableCell className="w-[150px]">
                   <Image
+                    className="rounded-lg"
                     src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F${product.image}?alt=media`}
                     alt="Illustration image"
                     width={100}
@@ -75,7 +77,7 @@ export default function Home() {
                   />
                 </TableCell>
                 <TableCell className="font-medium">{product.name}</TableCell>
-                <TableCell>{product.format}</TableCell>
+                <TableCell><FormatIcon format={product.format} /></TableCell>
                 <TableCell className="text-right">
                   <Stock value={product.stock} onChange={updateProductStock(product.id)} increment={4} />
                 </TableCell>
