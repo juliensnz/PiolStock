@@ -26,10 +26,11 @@ export default function Home() {
   }, []);
 
   const updateVariantStock = useCallback(
-    (productId: string, variantId: string) => (stock: number) => {
-      updateStock(productId, variantId, stock);
-      focusSearch();
-    },
+    (productId: string, variantId: string, currentStock: number, productName: string, format: string) =>
+      (stock: number) => {
+        updateStock(productId, variantId, stock, {previousStock: currentStock, productName, format});
+        focusSearch();
+      },
     [updateStock, focusSearch]
   );
 
@@ -72,7 +73,13 @@ export default function Home() {
         </div>
         <div className="relative w-full">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input ref={searchRef} placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} className="pl-9 pr-24" />
+          <Input
+            ref={searchRef}
+            placeholder="Search"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-9 pr-24"
+          />
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
             {variantCount} results
           </span>
@@ -103,8 +110,21 @@ export default function Home() {
                           {reserved} reserved
                         </span>
                       )}
-                      <FormatIcon format={variant.format} />
-                      <Stock value={variant.stock} onChange={updateVariantStock(product.id, variant.id)} increment={4} />
+                      <FormatIcon
+                        format={variant.format}
+                        imageUrl={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F${product.image}?alt=media`}
+                      />
+                      <Stock
+                        value={variant.stock}
+                        onChange={updateVariantStock(
+                          product.id,
+                          variant.id,
+                          variant.stock,
+                          product.name,
+                          variant.format
+                        )}
+                        increment={4}
+                      />
                     </div>
                   );
                 })}

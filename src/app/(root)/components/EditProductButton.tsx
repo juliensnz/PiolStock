@@ -78,7 +78,7 @@ const EditProductModal = ({product, handleClose}: {product: Product; handleClose
         existingByFormat.get(format) ?? createVariant(format)
       );
 
-      await updateProduct({...product, name, image, variants});
+      await updateProduct({...product, name, image, variants}, product);
       handleClose();
     } finally {
       setIsSaving(false);

@@ -6,9 +6,11 @@ import {Button} from '@/components/ui/button';
 import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {FormatIcon} from '@/app/(root)/components/FormatIcon';
+import {productRepository} from '@/infrastructure/ProductRepository';
 import {Loader2, PackagePlus, Search} from 'lucide-react';
 import Image from 'next/image';
 import {useCallback, useMemo, useState} from 'react';
+import {toast} from 'sonner';
 import {cn} from '@/lib/utils';
 
 const IMAGE_BASE_URL = 'https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F';
@@ -97,17 +99,32 @@ const MassAddModal = ({handleClose}: {handleClose: () => void}) => {
         changes.map(({variant, delta}) => ({
           productId: product.id,
           variantId: variant.id,
+          previousStock: variant.stock,
           newStock: variant.stock + delta,
         }))
       );
       await Promise.all(
         updates.map(({productId, variantId, newStock}) => updateStock(productId, variantId, newStock))
       );
+
+      toast(`Added stock to ${changedProducts.length} product(s) (+${totalChanges})`, {
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            Promise.all(
+              updates.map(({productId, variantId, previousStock}) =>
+                productRepository.updateStock(productId, variantId, previousStock)
+              )
+            );
+          },
+        },
+      });
+
       handleClose();
     } finally {
       setIsSubmitting(false);
     }
-  }, [changedProducts, updateStock, handleClose]);
+  }, [changedProducts, totalChanges, updateStock, handleClose]);
 
   return (
     <DialogContent className="flex h-[90vh] flex-col sm:max-w-2xl">
