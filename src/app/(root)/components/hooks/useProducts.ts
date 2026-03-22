@@ -33,4 +33,12 @@ const useUpdateStock = () => {
   }, []);
 };
 
-export {useProducts, useUpdateStock, useAddProduct};
+const useUpdateProduct = () => {
+  return useCallback(async (product: Product): Promise<void> => {
+    const result = await productRepository.updateProduct(product);
+
+    if (result.isError()) throw result.getError();
+  }, []);
+};
+
+export {useProducts, useUpdateStock, useAddProduct, useUpdateProduct};

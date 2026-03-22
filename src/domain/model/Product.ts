@@ -48,4 +48,4 @@ const sortVariantsBySize = (variants: ProductVariant[]): ProductVariant[] =>
   [...variants].sort((a, b) => FORMAT_SIZE_ORDER[a.format] - FORMAT_SIZE_ORDER[b.format]);
 
 export type {Product, ProductId, ProductVariant, VariantId, Format};
-export {createProduct, createProductWithAllFormats, sortVariantsBySize};
+export {FORMAT, createVariant, createProduct, createProductWithAllFormats, sortVariantsBySize};

@@ -1,6 +1,7 @@
 'use client';
 
 import {AddProductButton} from '@/app/(root)/components/AddProductButton';
+import {EditProductButton} from '@/app/(root)/components/EditProductButton';
 import {FormatIcon} from '@/app/(root)/components/FormatIcon';
 import {Stock} from '@/app/(root)/components/Stock';
 import {useProducts, useUpdateStock} from '@/app/(root)/components/hooks/useProducts';
@@ -69,7 +70,10 @@ export default function Home() {
               height={100}
             />
             <div className="flex min-w-0 flex-1 flex-col">
-              <h2 className="mb-3 text-lg font-semibold">{product.name}</h2>
+              <div className="mb-3 flex items-center gap-2">
+                <h2 className="text-lg font-semibold">{product.name}</h2>
+                <EditProductButton product={product} />
+              </div>
               <div className="flex flex-col gap-2">
                 {sortVariantsBySize(product.variants).map(variant => (
                   <div key={variant.id} className="flex items-center justify-end gap-3">
