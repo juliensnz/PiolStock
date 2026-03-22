@@ -4,46 +4,11 @@ import {AddProductButton} from '@/app/(root)/components/AddProductButton';
 import {Stock} from '@/app/(root)/components/Stock';
 import {useProducts, useUpdateStock} from '@/app/(root)/components/hooks/useProducts';
 import {Product} from '@/domain/model/Product';
-import {Table, Breadcrumb, getColor, Search} from 'akeneo-design-system';
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import {Input} from '@/components/ui/input';
+import {Search} from 'lucide-react';
 import Image from 'next/image';
 import {useCallback, useMemo, useState} from 'react';
-import styled from 'styled-components';
-
-const Spacer = styled.div`
-  flex: 1;
-`;
-
-const PageTitle = styled.h1`
-  color: ${getColor('brand', 120) as unknown as string};
-`;
-
-const Container = styled.div`
-  margin: 10px 10px 10px 10px;
-  background-color: white;
-  flex: 1;
-`;
-
-const PageHeaderSticky = styled.div`
-  display: flex;
-  justify-content: space-between;
-  position: sticky;
-  flex-direction: column;
-  top: 0;
-  background: white;
-  margin-bottom: 30px;
-  padding-top: 20px;
-`;
-
-const PageTop = styled.div`
-  display: flex;
-  width: 100%;
-`;
-
-const StockCell = styled(Table.Cell)``;
-
-const ImageCell = styled(Table.Cell)`
-  width: 150px;
-`;
 
 export default function Home() {
   const {data} = useProducts();
@@ -73,50 +38,52 @@ export default function Home() {
   }
 
   return (
-    <Container>
-      <PageHeaderSticky>
-        <PageTop>
-          <Breadcrumb>
-            <Breadcrumb.Step>Stock</Breadcrumb.Step>
-          </Breadcrumb>
-          <Spacer />
-
+    <div className="m-2.5 flex-1 bg-white">
+      <div className="sticky top-0 z-10 mb-8 flex flex-col justify-between bg-white pt-5">
+        <div className="flex w-full">
+          <h1 className="text-2xl font-bold text-primary">Product stock</h1>
+          <div className="flex-1" />
           <AddProductButton onAddProduct={handleAddProduct} />
-        </PageTop>
-        <PageTitle>Product stock</PageTitle>
-      </PageHeaderSticky>
-      <Search onSearchChange={setSearch} placeholder="Search" searchValue={search} title="Search">
-        <span>{filteredProducts.length} results</span>
-      </Search>
+        </div>
+      </div>
+      <div className="relative mb-4 w-full">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} className="pl-9 pr-24" />
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+          {filteredProducts.length} results
+        </span>
+      </div>
       <Table>
-        <Table.Header sticky={70}>
-          <Table.HeaderCell>Illustration</Table.HeaderCell>
-          <Table.HeaderCell>Name</Table.HeaderCell>
-          <Table.HeaderCell>Format</Table.HeaderCell>
-          <Table.HeaderCell>Stock</Table.HeaderCell>
-        </Table.Header>
-        <Table.Body>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Illustration</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Format</TableHead>
+            <TableHead className="text-right">Stock</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {filteredProducts.map(product => {
             return (
-              <Table.Row key={product.id}>
-                <ImageCell>
+              <TableRow key={product.id}>
+                <TableCell className="w-[150px]">
                   <Image
                     src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F${product.image}?alt=media`}
                     alt="Illustration image"
                     width={100}
                     height={100}
                   />
-                </ImageCell>
-                <Table.Cell rowTitle={true}>{product.name}</Table.Cell>
-                <Table.Cell>{product.format}</Table.Cell>
-                <StockCell>
+                </TableCell>
+                <TableCell className="font-medium">{product.name}</TableCell>
+                <TableCell>{product.format}</TableCell>
+                <TableCell className="text-right">
                   <Stock value={product.stock} onChange={updateProductStock(product.id)} increment={4} />
-                </StockCell>
-              </Table.Row>
+                </TableCell>
+              </TableRow>
             );
           })}
-        </Table.Body>
+        </TableBody>
       </Table>
-    </Container>
+    </div>
   );
 }
