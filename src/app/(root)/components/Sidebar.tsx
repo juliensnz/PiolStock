@@ -14,7 +14,7 @@ const Sidebar = () => {
   const pathname = usePathname() ?? '/';
 
   return (
-    <nav className="flex w-16 shrink-0 flex-col items-center gap-2 border-r border-border bg-muted/30 pt-4">
+    <nav className="flex w-16 shrink-0 flex-col gap-2 border-r border-border bg-muted/30 px-1.5 pt-4">
       {NAV_ITEMS.map(({href, label, icon: Icon}) => {
         const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
         return (
@@ -22,7 +22,7 @@ const Sidebar = () => {
             key={href}
             href={href}
             className={cn(
-              'flex flex-col items-center gap-0.5 rounded-lg px-2 py-2 text-xs transition-colors',
+              'flex flex-col items-center gap-0.5 rounded-lg py-2 text-xs transition-colors',
               isActive ? 'bg-primary/10 text-primary font-semibold' : 'text-muted-foreground hover:bg-muted hover:text-foreground'
             )}
           >
