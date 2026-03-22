@@ -1,16 +1,15 @@
 'use client';
 
-import {useImages} from '@/app/(root)/components/hooks/useImages';
+import {useUploadImage} from '@/app/(root)/components/hooks/useImages';
 import {useAddProducts} from '@/app/(root)/components/hooks/useProducts';
 import {createProduct, createProducts} from '@/domain/model/Product';
 import {Button} from '@/components/ui/button';
 import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Switch} from '@/components/ui/switch';
-import Image from 'next/image';
-import {useCallback, useState} from 'react';
+import {ImagePlus, Loader2} from 'lucide-react';
+import {useCallback, useRef, useState} from 'react';
 
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
@@ -34,24 +33,44 @@ const AddProductModal = ({
   handleClose: () => void;
   onAddProduct: (productName: string) => void;
 }) => {
-  const [imageName, setImageName] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [multipleSizes, setMultipleSizes] = useState(true);
-  const images = useImages();
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const uploadImage = useUploadImage();
   const addProducts = useAddProducts();
 
+  const handleFileChange = useCallback(
+    (selectedFile: File) => {
+      setFile(selectedFile);
+      setPreviewUrl(URL.createObjectURL(selectedFile));
+      if (!name) {
+        setName(capitalize(selectedFile.name.split('.')[0].replace(/_/g, ' ')));
+      }
+    },
+    [name],
+  );
+
   const handleCreateProduct = useCallback(async () => {
-    if (!name || !imageName) {
+    if (!name || !file) {
       return;
     }
 
-    const products = multipleSizes ? createProducts(name, imageName) : [createProduct(name, imageName, 'UNISIZE')];
+    setIsUploading(true);
+    try {
+      const fileName = await uploadImage(file, file.name);
+      const products = multipleSizes ? createProducts(name, fileName) : [createProduct(name, fileName, 'UNISIZE')];
 
-    await addProducts(products);
-    onAddProduct(name);
-    handleClose();
-  }, [onAddProduct, addProducts, imageName, multipleSizes, name, handleClose]);
+      await addProducts(products);
+      onAddProduct(name);
+      handleClose();
+    } finally {
+      setIsUploading(false);
+    }
+  }, [onAddProduct, addProducts, uploadImage, file, multipleSizes, name, handleClose]);
 
   return (
     <DialogContent className="sm:max-w-md">
@@ -59,52 +78,32 @@ const AddProductModal = ({
         <DialogTitle>Add Product</DialogTitle>
       </DialogHeader>
       <div className="flex flex-col items-center gap-4">
-        {imageName ? (
-          <Image
-            src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F${imageName}?alt=media`}
-            width={220}
-            height={220}
-            alt="Illustration image"
-            className="rounded-md"
-          />
-        ) : (
-          <div className="flex h-[220px] w-[220px] items-center justify-center rounded-md bg-muted text-muted-foreground">
-            No image
-          </div>
-        )}
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="flex h-[220px] w-[220px] cursor-pointer items-center justify-center overflow-hidden rounded-md border-2 border-dashed border-muted-foreground/25 transition-colors hover:border-muted-foreground/50"
+        >
+          {previewUrl ? (
+            <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <ImagePlus className="h-10 w-10" />
+              <span className="text-sm">Click to upload</span>
+            </div>
+          )}
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={e => {
+            const selectedFile = e.target.files?.[0];
+            if (selectedFile) handleFileChange(selectedFile);
+          }}
+        />
       </div>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="image-select">Image</Label>
-          <Select
-            value={imageName}
-            onValueChange={value => {
-              setImageName(value);
-              if (!name) {
-                setName(capitalize(value.split('.')[0].replace('_', ' ')));
-              }
-            }}
-          >
-            <SelectTrigger id="image-select" className="w-full">
-              <SelectValue placeholder="Please choose an image" />
-            </SelectTrigger>
-            <SelectContent>
-              {images.map(image => (
-                <SelectItem key={image} value={image}>
-                  <div className="flex items-center gap-2.5">
-                    <Image
-                      src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F${image}?alt=media`}
-                      width={30}
-                      height={30}
-                      alt="Illustration image"
-                    />
-                    {capitalize(image.split('.')[0].replace('_', ' '))}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="name-input">Name</Label>
           <Input id="name-input" value={name} onChange={e => setName(e.target.value)} placeholder="Plage" />
@@ -115,10 +114,19 @@ const AddProductModal = ({
         </div>
       </div>
       <DialogFooter>
-        <Button variant="outline" onClick={handleClose}>
+        <Button variant="outline" onClick={handleClose} disabled={isUploading}>
           Cancel
         </Button>
-        <Button onClick={handleCreateProduct}>Confirm</Button>
+        <Button onClick={handleCreateProduct} disabled={!name || !file || isUploading}>
+          {isUploading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Uploading...
+            </>
+          ) : (
+            'Confirm'
+          )}
+        </Button>
       </DialogFooter>
     </DialogContent>
   );

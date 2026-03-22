@@ -1,5 +1,5 @@
 import {imagesRepository} from '@/infrastructure/ImageRepository';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 const useImages = () => {
   const [images, setImages] = useState<string[]>([]);
@@ -19,4 +19,14 @@ const useImages = () => {
   return images;
 };
 
-export {useImages};
+const useUploadImage = () => {
+  return useCallback(async (file: File, fileName: string): Promise<string> => {
+    const result = await imagesRepository.upload(file, fileName);
+
+    if (result.isError()) throw result.getError();
+
+    return result.get();
+  }, []);
+};
+
+export {useImages, useUploadImage};
