@@ -1,7 +1,7 @@
 import {Either, Result} from '@/domain/model/common/Result';
 import {RuntimeError} from '@/domain/model/common/RuntimeError';
 import {firebaseApp} from '@/lib/firebase';
-import {FirebaseStorage, getStorage, listAll, ref} from 'firebase/storage';
+import {FirebaseStorage, getStorage, listAll, ref, uploadBytes} from 'firebase/storage';
 
 const storage = getStorage(firebaseApp);
 
@@ -15,6 +15,21 @@ const imagesRepositoryCreator = ({storage}: {storage: FirebaseStorage}) => ({
       return Result.Error({
         type: 'image_repository.find_all',
         message: 'Error fetching images',
+        payload: {error},
+      });
+    }
+  },
+
+  upload: async (file: File, fileName: string): Promise<Either<string, RuntimeError>> => {
+    try {
+      const imageRef = ref(storage, `images/${fileName}`);
+      await uploadBytes(imageRef, file);
+
+      return Result.Ok(fileName);
+    } catch (error) {
+      return Result.Error({
+        type: 'image_repository.upload',
+        message: 'Error uploading image',
         payload: {error},
       });
     }
