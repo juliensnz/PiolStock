@@ -28,14 +28,15 @@ const ProductCombobox = ({
   }, [products, search]);
 
   return (
-    <Popover open={open} onOpenChange={(next) => { setOpen(next); if (!next) setSearch(''); }}>
+    <Popover
+      open={open}
+      onOpenChange={next => {
+        setOpen(next);
+        if (!next) setSearch('');
+      }}
+    >
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between font-normal"
-        >
+        <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between font-normal">
           <span className="truncate">{selectedName ?? 'Select product'}</span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>

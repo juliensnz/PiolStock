@@ -1,6 +1,7 @@
 'use client';
 
 import {AddProductButton} from '@/app/(root)/components/AddProductButton';
+import {MassAddButton} from '@/app/(root)/components/MassAddButton';
 import {EditProductButton} from '@/app/(root)/components/EditProductButton';
 import {FormatIcon} from '@/app/(root)/components/FormatIcon';
 import {Stock} from '@/app/(root)/components/Stock';
@@ -64,7 +65,10 @@ export default function Home() {
         <div className="flex w-full">
           <h1 className="text-2xl font-bold text-primary">Product stock</h1>
           <div className="flex-1" />
-          <AddProductButton onAddProduct={handleAddProduct} />
+          <div className="flex gap-2">
+            <MassAddButton />
+            <AddProductButton onAddProduct={handleAddProduct} />
+          </div>
         </div>
         <div className="relative w-full">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
