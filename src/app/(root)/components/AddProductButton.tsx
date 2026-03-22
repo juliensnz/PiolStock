@@ -1,49 +1,31 @@
+'use client';
+
 import {useImages} from '@/app/(root)/components/hooks/useImages';
 import {useAddProducts} from '@/app/(root)/components/hooks/useProducts';
 import {createProduct, createProducts} from '@/domain/model/Product';
-import {
-  BooleanInput,
-  Button,
-  ChannelsIllustration,
-  Field,
-  Image,
-  Modal,
-  SelectInput,
-  TextInput,
-  useBooleanState,
-} from 'akeneo-design-system';
+import {Button} from '@/components/ui/button';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Switch} from '@/components/ui/switch';
+import Image from 'next/image';
 import {useCallback, useState} from 'react';
-import styled from 'styled-components';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const BottomButtons = styled(Modal.BottomButtons)`
-  display: flex;
-  justify-content: flex-end;
-`;
+const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
 const AddProductButton = ({onAddProduct}: {onAddProduct: (productName: string) => void}) => {
-  const [isOpen, open, close] = useBooleanState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
-      <Button onClick={open}>Add Product</Button>
-      {isOpen && <AddProductModal onAddProduct={onAddProduct} handleClose={close} />}
+      <Button onClick={() => setIsOpen(true)}>Add Product</Button>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <AddProductModal onAddProduct={onAddProduct} handleClose={() => setIsOpen(false)} />
+      </Dialog>
     </>
   );
 };
-
-const SelectContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
-
-const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
 const AddProductModal = ({
   handleClose,
@@ -72,72 +54,73 @@ const AddProductModal = ({
   }, [onAddProduct, addProducts, imageName, multipleSizes, name, handleClose]);
 
   return (
-    <Modal
-      closeTitle="Close modal"
-      onClose={handleClose}
-      illustration={
-        imageName ? (
+    <DialogContent className="sm:max-w-md">
+      <DialogHeader>
+        <DialogTitle>Add Product</DialogTitle>
+      </DialogHeader>
+      <div className="flex flex-col items-center gap-4">
+        {imageName ? (
           <Image
             src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F${imageName}?alt=media`}
             width={220}
             height={220}
             alt="Illustration image"
+            className="rounded-md"
           />
         ) : (
-          <ChannelsIllustration />
-        )
-      }
-    >
-      <Container>
-        <Field label="Image">
-          <SelectInput
-            emptyResultLabel="No image found"
-            onChange={imageName => {
-              setImageName(imageName);
+          <div className="flex h-[220px] w-[220px] items-center justify-center rounded-md bg-muted text-muted-foreground">
+            No image
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="image-select">Image</Label>
+          <Select
+            value={imageName}
+            onValueChange={value => {
+              setImageName(value);
               if (!name) {
-                setName(capitalize(imageName.split('.')[0].replace('_', ' ')));
+                setName(capitalize(value.split('.')[0].replace('_', ' ')));
               }
             }}
-            placeholder="Please chose an image"
-            value={imageName}
-            clearable={false}
-            openLabel=""
           >
-            {images.map(image => (
-              <SelectInput.Option key={image} title={image} value={image}>
-                <SelectContainer>
-                  <Image
-                    src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F${image}?alt=media`}
-                    width={30}
-                    height={30}
-                    alt="Illustration image"
-                  />
-                  {capitalize(image.split('.')[0].replace('_', ' '))}
-                </SelectContainer>
-              </SelectInput.Option>
-            ))}
-          </SelectInput>
-        </Field>
-        <Field label="Name">
-          <TextInput value={name} onChange={setName} placeholder="Plage" />
-        </Field>
-        <Field label="Multiple sizes">
-          <BooleanInput
-            clearLabel="Clear value"
-            noLabel="No"
-            onChange={setMultipleSizes}
-            value={multipleSizes}
-            yesLabel="Yes"
-          />
-        </Field>
-      </Container>
-      <BottomButtons>
-        <Button level="tertiary" onClick={handleClose}>
+            <SelectTrigger id="image-select" className="w-full">
+              <SelectValue placeholder="Please choose an image" />
+            </SelectTrigger>
+            <SelectContent>
+              {images.map(image => (
+                <SelectItem key={image} value={image}>
+                  <div className="flex items-center gap-2.5">
+                    <Image
+                      src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F${image}?alt=media`}
+                      width={30}
+                      height={30}
+                      alt="Illustration image"
+                    />
+                    {capitalize(image.split('.')[0].replace('_', ' '))}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="name-input">Name</Label>
+          <Input id="name-input" value={name} onChange={e => setName(e.target.value)} placeholder="Plage" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch id="multiple-sizes" checked={multipleSizes} onCheckedChange={setMultipleSizes} />
+          <Label htmlFor="multiple-sizes">Multiple sizes</Label>
+        </div>
+      </div>
+      <DialogFooter>
+        <Button variant="outline" onClick={handleClose}>
           Cancel
         </Button>
         <Button onClick={handleCreateProduct}>Confirm</Button>
-      </BottomButtons>
-    </Modal>
+      </DialogFooter>
+    </DialogContent>
   );
 };
 

@@ -1,11 +1,5 @@
-import styled from 'styled-components';
-
-const PageContainer = styled.div`
-  width: 100vw;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-`;
+const PageContainer = ({children}: {children: React.ReactNode}) => {
+  return <div className="relative flex h-full w-screen flex-col">{children}</div>;
+};
 
 export {PageContainer};
