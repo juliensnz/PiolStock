@@ -5,15 +5,17 @@ import {EditProductButton} from '@/app/(root)/components/EditProductButton';
 import {FormatIcon} from '@/app/(root)/components/FormatIcon';
 import {Stock} from '@/app/(root)/components/Stock';
 import {useProducts, useUpdateStock} from '@/app/(root)/components/hooks/useProducts';
+import {useReservedStock} from '@/app/(root)/components/hooks/useOrders';
 import {Product, sortVariantsBySize} from '@/domain/model/Product';
 import {Input} from '@/components/ui/input';
-import {Search} from 'lucide-react';
+import {Loader2, Search} from 'lucide-react';
 import Image from 'next/image';
 import {useCallback, useMemo, useRef, useState} from 'react';
 
 export default function Home() {
   const {data} = useProducts();
   const updateStock = useUpdateStock();
+  const reservedStock = useReservedStock();
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -49,7 +51,11 @@ export default function Home() {
   );
 
   if (undefined === products) {
-    return null;
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
   return (
@@ -84,12 +90,20 @@ export default function Home() {
                 <EditProductButton product={product} />
               </div>
               <div className="flex flex-col gap-2">
-                {sortVariantsBySize(product.variants).map(variant => (
-                  <div key={variant.id} className="flex items-center justify-end gap-3">
-                    <FormatIcon format={variant.format} />
-                    <Stock value={variant.stock} onChange={updateVariantStock(product.id, variant.id)} increment={4} />
-                  </div>
-                ))}
+                {sortVariantsBySize(product.variants).map(variant => {
+                  const reserved = reservedStock.get(variant.id) ?? 0;
+                  return (
+                    <div key={variant.id} className="flex items-center justify-end gap-3">
+                      {reserved > 0 && (
+                        <span className="inline-flex items-center whitespace-nowrap rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                          {reserved} reserved
+                        </span>
+                      )}
+                      <FormatIcon format={variant.format} />
+                      <Stock value={variant.stock} onChange={updateVariantStock(product.id, variant.id)} increment={4} />
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

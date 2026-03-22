@@ -92,10 +92,9 @@ export function useSubscription<TData, TError, R = TData>(
       unsubscribe = subscribeFn(async data => {
         eventCount[subscriptionHash] ??= 0;
         eventCount[subscriptionHash]++;
+        queryClient.setQueryData(queryKey, data);
         if (eventCount[subscriptionHash] === 1) {
           resolvePromise(data || null);
-        } else {
-          queryClient.setQueryData(queryKey, data);
         }
       });
       unsubscribes[subscriptionHash] = unsubscribe;
