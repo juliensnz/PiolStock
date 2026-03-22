@@ -29,8 +29,11 @@ const OrderCard = ({order}: OrderCardProps) => {
   }, [order, shipOrder]);
 
   const handleDelete = useCallback(() => {
-    deleteOrder(order.id);
-  }, [order.id, deleteOrder]);
+    if (!window.confirm(`Delete order #${order.orderNumber} for "${order.customerName}"?`)) return;
+    const {computedStatus: _, ...baseOrder} = order;
+    const baseItems = baseOrder.items.map(({quantityInStock: _qi, quantityToPrint: _qp, ...rest}) => rest);
+    deleteOrder(order.id, {...baseOrder, items: baseItems});
+  }, [order, deleteOrder]);
 
   const isShipped = order.computedStatus === 'SHIPPED';
   const canShip = order.computedStatus === 'READY_TO_SHIP';
@@ -59,14 +62,10 @@ const OrderCard = ({order}: OrderCardProps) => {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          {!isShipped && (
-            <>
-              <EditOrderButton order={order} />
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={handleDelete}>
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </>
-          )}
+          {!isShipped && <EditOrderButton order={order} />}
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={handleDelete}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 

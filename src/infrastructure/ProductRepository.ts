@@ -116,6 +116,39 @@ const productRepositoryCreator = ({db}: {db: Firestore}) => ({
       });
     }
   },
+  incrementStock: async (
+    productId: ProductId,
+    variantId: VariantId,
+    amount: number
+  ): Promise<Either<void, RuntimeError>> => {
+    try {
+      const productRef = doc(db, PRODUCTS_COLLECTION, productId);
+      const snapshot = await getDoc(productRef);
+
+      if (!snapshot.exists()) {
+        return Result.Error({
+          type: 'product_repository.increment_stock',
+          message: 'Product not found',
+          payload: {productId, variantId, amount},
+        });
+      }
+
+      const product = snapshot.data() as Product;
+      const updatedVariants = product.variants.map(variant =>
+        variant.id === variantId ? {...variant, stock: variant.stock + amount} : variant
+      );
+
+      await setDoc(productRef, {...product, variants: updatedVariants});
+
+      return Result.Ok();
+    } catch (error) {
+      return Result.Error({
+        type: 'product_repository.increment_stock',
+        message: 'Error incrementing stock',
+        payload: {productId, variantId, amount, error},
+      });
+    }
+  },
   deleteProduct: async (productId: ProductId) => {
     try {
       await deleteDoc(doc(db, PRODUCTS_COLLECTION, productId));

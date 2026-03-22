@@ -95,13 +95,16 @@ const EditOrderModal = ({order, handleClose}: {order: Order; handleClose: () => 
         );
       });
 
-      await updateOrder({
-        ...order,
-        orderNumber,
-        customerName,
-        shippingAddress: address,
-        items,
-      });
+      await updateOrder(
+        {
+          ...order,
+          orderNumber,
+          customerName,
+          shippingAddress: address,
+          items,
+        },
+        order
+      );
       handleClose();
     } finally {
       setIsSaving(false);
