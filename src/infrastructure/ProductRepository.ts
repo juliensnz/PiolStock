@@ -1,50 +1,34 @@
-import {Product, ProductId} from '@/domain/model/Product';
-import {Either, Error, Result} from '@/domain/model/common/Result';
+import {Product, ProductId, VariantId} from '@/domain/model/Product';
+import {Either, Result} from '@/domain/model/common/Result';
 import {RuntimeError} from '@/domain/model/common/RuntimeError';
 import {firebaseApp} from '@/lib/firebase';
 import {
   getFirestore,
   doc,
   setDoc,
+  getDoc,
   Firestore,
   query,
   collection,
   onSnapshot,
   orderBy,
   deleteDoc,
-  updateDoc,
 } from 'firebase/firestore';
 import {v4 as uuidv4} from 'uuid';
+
+const PRODUCTS_COLLECTION = 'products_with_variants';
 
 const db = getFirestore(firebaseApp);
 
 const productRepositoryCreator = ({db}: {db: Firestore}) => ({
-  addProducts: async (product: Omit<Product, 'id'>[]): Promise<Either<Product[], RuntimeError>> => {
+  addProduct: async (product: Omit<Product, 'id'>): Promise<Either<Product, RuntimeError>> => {
     try {
-      const productResults = await Promise.all(
-        product.map(async (product): Promise<Either<Product, RuntimeError>> => {
-          const id = uuidv4();
-          const productToCreate = {...product, id};
+      const id = uuidv4();
+      const productToCreate = {...product, id};
 
-          await setDoc(doc(db, 'products', id), productToCreate);
+      await setDoc(doc(db, PRODUCTS_COLLECTION, id), productToCreate);
 
-          return Result.Ok(productToCreate);
-        })
-      );
-
-      if (!Result.isAllOk(productResults)) {
-        return Result.Error({
-          type: 'product_repository.add_products',
-          message: 'Error adding products',
-          payload: {
-            errors: productResults
-              .filter(result => result.isError())
-              .map(result => (result as Error<Product, RuntimeError>).getError()),
-          },
-        });
-      }
-
-      return Result.allOk(productResults);
+      return Result.Ok(productToCreate);
     } catch (error) {
       return Result.Error({
         type: 'product_repository.add_product',
@@ -53,35 +37,55 @@ const productRepositoryCreator = ({db}: {db: Firestore}) => ({
       });
     }
   },
-  updateStock: async (productId: ProductId, stock: number): Promise<Either<void, RuntimeError>> => {
+  updateStock: async (
+    productId: ProductId,
+    variantId: VariantId,
+    stock: number
+  ): Promise<Either<void, RuntimeError>> => {
     try {
-      await updateDoc(doc(db, 'products', productId), {stock});
+      const productRef = doc(db, PRODUCTS_COLLECTION, productId);
+      const snapshot = await getDoc(productRef);
+
+      if (!snapshot.exists()) {
+        return Result.Error({
+          type: 'product_repository.update_stock',
+          message: 'Product not found',
+          payload: {productId, variantId, stock},
+        });
+      }
+
+      const product = snapshot.data() as Product;
+      const updatedVariants = product.variants.map(variant =>
+        variant.id === variantId ? {...variant, stock} : variant
+      );
+
+      await setDoc(productRef, {...product, variants: updatedVariants});
 
       return Result.Ok();
     } catch (error) {
       return Result.Error({
         type: 'product_repository.update_stock',
         message: 'Error updating stock',
-        payload: {productId, stock, error},
+        payload: {productId, variantId, stock, error},
       });
     }
   },
   deleteProduct: async (productId: ProductId) => {
     try {
-      await deleteDoc(doc(db, 'products', productId));
+      await deleteDoc(doc(db, PRODUCTS_COLLECTION, productId));
 
       return Result.Ok();
     } catch (error) {
       return Result.Error({
         type: 'product_repository.delete_product',
-        message: 'Error deleteing product',
+        message: 'Error deleting product',
         payload: {productId, error},
       });
     }
   },
   getRef: () => {
     try {
-      const q = query(collection(db, 'products'), orderBy('format', 'asc'));
+      const q = query(collection(db, PRODUCTS_COLLECTION), orderBy('name', 'asc'));
 
       return Result.Ok(q);
     } catch (error) {
@@ -94,7 +98,7 @@ const productRepositoryCreator = ({db}: {db: Firestore}) => ({
   },
   streamProducts: (updateProducts: (products: Product[]) => void) => {
     try {
-      const q = query(collection(db, 'products'), orderBy('format', 'asc'));
+      const q = query(collection(db, PRODUCTS_COLLECTION), orderBy('name', 'asc'));
       const unsubscribe = onSnapshot(q, querySnapshot => {
         const products: Product[] = [];
         querySnapshot.forEach(doc => {
