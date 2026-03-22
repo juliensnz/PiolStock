@@ -70,6 +70,19 @@ const productRepositoryCreator = ({db}: {db: Firestore}) => ({
       });
     }
   },
+  updateProduct: async (product: Product): Promise<Either<void, RuntimeError>> => {
+    try {
+      const productRef = doc(db, PRODUCTS_COLLECTION, product.id);
+      await setDoc(productRef, product);
+      return Result.Ok();
+    } catch (error) {
+      return Result.Error({
+        type: 'product_repository.update_product',
+        message: 'Error updating product',
+        payload: {product, error},
+      });
+    }
+  },
   deleteProduct: async (productId: ProductId) => {
     try {
       await deleteDoc(doc(db, PRODUCTS_COLLECTION, productId));
