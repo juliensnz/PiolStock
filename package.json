@@ -39,6 +39,8 @@
     "uuid": "^11.0.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.0.0"
+    "@eslint/eslintrc": "^3.0.0",
+    "firebase-admin": "^13.7.0",
+    "tsx": "^4.21.0"
   }
 }

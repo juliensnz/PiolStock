@@ -4,8 +4,7 @@ import {AddProductButton} from '@/app/(root)/components/AddProductButton';
 import {FormatIcon} from '@/app/(root)/components/FormatIcon';
 import {Stock} from '@/app/(root)/components/Stock';
 import {useProducts, useUpdateStock} from '@/app/(root)/components/hooks/useProducts';
-import {Product} from '@/domain/model/Product';
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import {Product, sortVariantsBySize} from '@/domain/model/Product';
 import {Input} from '@/components/ui/input';
 import {Search} from 'lucide-react';
 import Image from 'next/image';
@@ -16,8 +15,8 @@ export default function Home() {
   const updateStock = useUpdateStock();
   const [search, setSearch] = useState('');
 
-  const updateProductStock = useCallback(
-    (productId: string) => (stock: number) => updateStock(productId, stock),
+  const updateVariantStock = useCallback(
+    (productId: string, variantId: string) => (stock: number) => updateStock(productId, variantId, stock),
     [updateStock]
   );
 
@@ -25,6 +24,11 @@ export default function Home() {
   const filteredProducts = useMemo(
     () => products?.filter(product => product.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) ?? [],
     [products, search]
+  );
+
+  const variantCount = useMemo(
+    () => filteredProducts.reduce((sum, product) => sum + product.variants.length, 0),
+    [filteredProducts]
   );
 
   const handleAddProduct = useCallback(
@@ -47,45 +51,37 @@ export default function Home() {
           <AddProductButton onAddProduct={handleAddProduct} />
         </div>
       </div>
-      <div className="relative mb-4 w-full">
+      <div className="relative mb-6 w-full">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} className="pl-9 pr-24" />
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-          {filteredProducts.length} results
+          {variantCount} results
         </span>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Illustration</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Format</TableHead>
-            <TableHead className="text-right">Stock</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredProducts.map(product => {
-            return (
-              <TableRow key={product.id}>
-                <TableCell className="w-[150px]">
-                  <Image
-                    className="rounded-lg"
-                    src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F${product.image}?alt=media`}
-                    alt="Illustration image"
-                    width={100}
-                    height={100}
-                  />
-                </TableCell>
-                <TableCell className="font-medium">{product.name}</TableCell>
-                <TableCell><FormatIcon format={product.format} /></TableCell>
-                <TableCell className="text-right">
-                  <Stock value={product.stock} onChange={updateProductStock(product.id)} increment={4} />
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+      <div className="grid gap-4">
+        {filteredProducts.map(product => (
+          <div key={product.id} className="flex gap-5 rounded-xl border border-border bg-white p-4 shadow-sm">
+            <Image
+              className="shrink-0 self-start rounded-lg border border-border shadow-sm"
+              src={`https://firebasestorage.googleapis.com/v0/b/piolstock.appspot.com/o/images%2F${product.image}?alt=media`}
+              alt={product.name}
+              width={100}
+              height={100}
+            />
+            <div className="flex min-w-0 flex-1 flex-col">
+              <h2 className="mb-3 text-lg font-semibold">{product.name}</h2>
+              <div className="flex flex-col gap-2">
+                {sortVariantsBySize(product.variants).map(variant => (
+                  <div key={variant.id} className="flex items-center justify-end gap-3">
+                    <FormatIcon format={variant.format} />
+                    <Stock value={variant.stock} onChange={updateVariantStock(product.id, variant.id)} increment={4} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

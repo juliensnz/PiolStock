@@ -1,8 +1,8 @@
 'use client';
 
 import {useUploadImage} from '@/app/(root)/components/hooks/useImages';
-import {useAddProducts} from '@/app/(root)/components/hooks/useProducts';
-import {createProduct, createProducts} from '@/domain/model/Product';
+import {useAddProduct} from '@/app/(root)/components/hooks/useProducts';
+import {createProduct, createProductWithAllFormats} from '@/domain/model/Product';
 import {Button} from '@/components/ui/button';
 import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
@@ -41,7 +41,7 @@ const AddProductModal = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const uploadImage = useUploadImage();
-  const addProducts = useAddProducts();
+  const addProduct = useAddProduct();
 
   const handleFileChange = useCallback(
     (selectedFile: File) => {
@@ -62,15 +62,17 @@ const AddProductModal = ({
     setIsUploading(true);
     try {
       const fileName = await uploadImage(file, file.name);
-      const products = multipleSizes ? createProducts(name, fileName) : [createProduct(name, fileName, 'UNISIZE')];
+      const product = multipleSizes
+        ? createProductWithAllFormats(name, fileName)
+        : createProduct(name, fileName, 'UNISIZE');
 
-      await addProducts(products);
+      await addProduct(product);
       onAddProduct(name);
       handleClose();
     } finally {
       setIsUploading(false);
     }
-  }, [onAddProduct, addProducts, uploadImage, file, multipleSizes, name, handleClose]);
+  }, [onAddProduct, addProduct, uploadImage, file, multipleSizes, name, handleClose]);
 
   return (
     <DialogContent className="sm:max-w-md">
