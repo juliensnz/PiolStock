@@ -2,14 +2,18 @@
 
 import {useUploadImage} from '@/app/(root)/components/hooks/useImages';
 import {useAddProduct} from '@/app/(root)/components/hooks/useProducts';
-import {createProduct, createProductWithAllFormats} from '@/domain/model/Product';
+import {FORMAT, createVariant, type Format} from '@/domain/model/Product';
 import {Button} from '@/components/ui/button';
+import {Checkbox} from '@/components/ui/checkbox';
 import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {Switch} from '@/components/ui/switch';
 import {ImagePlus, Loader2} from 'lucide-react';
 import {useCallback, useRef, useState} from 'react';
+
+const DEFAULT_FORMATS = new Set<Format>(
+  Object.values(FORMAT).filter(f => f !== 'UNISIZE')
+);
 
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
@@ -36,7 +40,7 @@ const AddProductModal = ({
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [name, setName] = useState('');
-  const [multipleSizes, setMultipleSizes] = useState(true);
+  const [selectedFormats, setSelectedFormats] = useState<Set<Format>>(() => new Set(DEFAULT_FORMATS));
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -54,17 +58,32 @@ const AddProductModal = ({
     [name],
   );
 
+  const toggleFormat = useCallback((format: Format) => {
+    setSelectedFormats(prev => {
+      const next = new Set(prev);
+      if (next.has(format)) {
+        if (next.size > 1) next.delete(format);
+      } else {
+        next.add(format);
+      }
+      return next;
+    });
+  }, []);
+
   const handleCreateProduct = useCallback(async () => {
-    if (!name || !file) {
+    if (!name || !file || selectedFormats.size === 0) {
       return;
     }
 
     setIsUploading(true);
     try {
       const fileName = await uploadImage(file, file.name);
-      const product = multipleSizes
-        ? createProductWithAllFormats(name, fileName)
-        : createProduct(name, fileName, 'UNISIZE');
+      const product = {
+        id: crypto.randomUUID(),
+        name,
+        image: fileName,
+        variants: [...selectedFormats].map(createVariant),
+      };
 
       await addProduct(product);
       onAddProduct(name);
@@ -72,7 +91,7 @@ const AddProductModal = ({
     } finally {
       setIsUploading(false);
     }
-  }, [onAddProduct, addProduct, uploadImage, file, multipleSizes, name, handleClose]);
+  }, [onAddProduct, addProduct, uploadImage, file, selectedFormats, name, handleClose]);
 
   return (
     <DialogContent className="sm:max-w-md">
@@ -110,16 +129,26 @@ const AddProductModal = ({
           <Label htmlFor="name-input">Name</Label>
           <Input id="name-input" value={name} onChange={e => setName(e.target.value)} placeholder="Plage" />
         </div>
-        <div className="flex items-center gap-2">
-          <Switch id="multiple-sizes" checked={multipleSizes} onCheckedChange={setMultipleSizes} />
-          <Label htmlFor="multiple-sizes">Multiple sizes</Label>
+        <div className="flex flex-col gap-2">
+          <Label>Formats</Label>
+          <div className="flex flex-wrap gap-3">
+            {Object.values(FORMAT).map(format => (
+              <label key={format} className="flex items-center gap-1.5 cursor-pointer">
+                <Checkbox
+                  checked={selectedFormats.has(format)}
+                  onCheckedChange={() => toggleFormat(format)}
+                />
+                <span className="text-sm">{format}</span>
+              </label>
+            ))}
+          </div>
         </div>
       </div>
       <DialogFooter>
         <Button variant="outline" onClick={handleClose} disabled={isUploading}>
           Cancel
         </Button>
-        <Button onClick={handleCreateProduct} disabled={!name || !file || isUploading}>
+        <Button onClick={handleCreateProduct} disabled={!name || !file || selectedFormats.size === 0 || isUploading}>
           {isUploading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
