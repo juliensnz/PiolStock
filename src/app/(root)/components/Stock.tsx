@@ -43,7 +43,7 @@ const ChangeButton = styled.button<{color: string; gradient: number}>`
   align-items: center;
   background-color: transparent;
   border: none;
-  color: ${props => getColor(props.color, props.gradient)};
+  color: ${props => (getColor(props.color, props.gradient) as unknown as (p: typeof props) => string)(props)};
 
   &:not(:last-child) {
     border-right: 1px solid #d2d2d2;
