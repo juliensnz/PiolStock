@@ -11,17 +11,22 @@ const FORMAT_SIZES: Record<Format, {width: number; height: number}> = {
 
 type FormatIconProps = {
   format: Format;
+  imageUrl?: string | null;
 };
 
-const FormatIcon = ({format}: FormatIconProps) => {
+const FormatIcon = ({format, imageUrl}: FormatIconProps) => {
   const {width, height} = FORMAT_SIZES[format];
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex w-[100px] shrink-0 items-center gap-2">
       <div
-        className="flex shrink-0 items-center justify-center rounded-sm border border-border bg-muted/50"
+        className="flex shrink-0 items-center justify-center overflow-hidden rounded-sm border border-border bg-muted/50"
         style={{width, height}}
-      />
+      >
+        {imageUrl && (
+          <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+        )}
+      </div>
       <span className="text-sm font-medium text-muted-foreground">{format}</span>
     </div>
   );
