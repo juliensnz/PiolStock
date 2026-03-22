@@ -1,10 +1,20 @@
 /** @type {import('next').NextConfig} */
-const withImages = require('next-images');
-const webpack = require('webpack');
-const withPlugins = require('next-compose-plugins');
-const withTM = require('next-transpile-modules')(['akeneo-design-system']);
+import webpack from 'webpack';
+import path from 'path';
+import {fileURLToPath} from 'url';
 
-module.exports = withPlugins([withTM, [withImages]], {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const nextConfig = {
+  transpilePackages: ['akeneo-design-system'],
+  turbopack: {
+    resolveAlias: {
+      'akeneo-design-system/lib/components/Input/TextAreaInput/RichTextEditor.js': path.resolve(
+        __dirname,
+        'src/lib/wysiwyg.js'
+      ),
+    },
+  },
   webpack: (config, options) => {
     if (!options.isServer) {
       config.resolve.alias['@sentry/node'] = '@sentry/browser';
@@ -12,10 +22,9 @@ module.exports = withPlugins([withTM, [withImages]], {
     config.plugins.push(
       new webpack.NormalModuleReplacementPlugin(
         /akeneo-design-system\/lib\/components\/Input\/TextAreaInput\/RichTextEditor.js/,
-        require.resolve(`${__dirname}/src/lib/wysiwyg.js`)
+        path.resolve(__dirname, 'src/lib/wysiwyg.js')
       )
     );
-
     return config;
   },
   compiler: {styledComponents: true},
@@ -29,4 +38,6 @@ module.exports = withPlugins([withTM, [withImages]], {
       },
     ],
   },
-});
+};
+
+export default nextConfig;

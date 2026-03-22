@@ -14,7 +14,7 @@ const Spacer = styled.div`
 `;
 
 const PageTitle = styled.h1`
-  color: ${getColor('brand', 120)};
+  color: ${getColor('brand', 120) as unknown as string};
 `;
 
 const Container = styled.div`
